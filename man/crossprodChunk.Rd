@@ -20,6 +20,6 @@ A symmetric matrix X'X
 Compute X'X in chunks
 }
 \examples{
-crossprodChunk(matrix(rnorm(n.obs * n.vars), 1e4, 1e2), row.chunk = 500, FALSE)
+crossprodChunk(matrix(rnorm(1e4 * 1e2), 1e4, 1e2), row.chunk = 500, FALSE)
 }
 

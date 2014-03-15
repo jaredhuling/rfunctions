@@ -48,7 +48,7 @@ setMethod("crossprodcpp", signature(x = "matrix", w = "numeric"),
 #' @return A symmetric matrix X'X
 #' @export
 #' @examples
-#' crossprodChunk(matrix(rnorm(n.obs * n.vars), 1e4, 1e2), row.chunk = 500, FALSE)
+#' crossprodChunk(matrix(rnorm(1e4 * 1e2), 1e4, 1e2), row.chunk = 500, FALSE)
 crossprodChunk <- function(X, row.chunk = NULL, sparse = FALSE){
   if (sparse) {
     if (!is.null(w)) X<-sqrt(w) * X

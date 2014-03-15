@@ -1,4 +1,4 @@
-useDynLib(fastoem)
+useDynLib(rfunctions)
 import(RcppEigen)
 importFrom(Rcpp, evalCpp)
 exportPattern("^[[:alpha:]]+")
