@@ -1,0 +1,8 @@
+useDynLib(fastoem)
+import(RcppEigen)
+importFrom(Rcpp, evalCpp)
+exportPattern("^[[:alpha:]]+")
+exportMethods(
+    "add",
+    "subtract" 
+)
