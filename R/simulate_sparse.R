@@ -1,5 +1,5 @@
 
-#' Compute Largest Singular Value of Matrix x
+#' Simulate a matrix with very few nonzero entries
 #'
 #' @param sparsity numeric value between 0 and 1 indicating level of sparseness
 #' @param dim numeric vector of length 2 indicating matrix dimensions

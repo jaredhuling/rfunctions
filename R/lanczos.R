@@ -10,6 +10,8 @@
 #' memory, most accurate. Not implemented yet)
 #' @param upper.bound.prob upper bound probability for the largest singular value
 #' @return list 
+#' @references Hochstenbach (2013) Probabilistic upper bounds for the matrix two-norm, http://link.springer.com/article/10.1007/s10915-013-9716-x 
+#' Journal of Scientific Computing, Vol. 57(3), Dec. 2013
 #' @export
 #' @examples
 #'n.obs <- 1e5

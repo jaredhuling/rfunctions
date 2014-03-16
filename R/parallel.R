@@ -1,5 +1,5 @@
 
-#' Initialized parallel workers
+#' Initialize parallel workers
 #'
 #' @param ncores integer number of cores to initialize
 #' @return cluster object 
