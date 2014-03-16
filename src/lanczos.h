@@ -16,9 +16,9 @@ using namespace Rcpp;
 using namespace RcppEigen;
 
 
-RcppExport SEXP GKLBidiag(SEXP, SEXP, SEXP);
+RcppExport SEXP GKLBidiag(SEXP, SEXP, SEXP, SEXP);
 
-RcppExport SEXP GKLBidiagSparse(SEXP, SEXP, SEXP);
+RcppExport SEXP GKLBidiagSparse(SEXP, SEXP, SEXP, SEXP);
 
 RcppExport SEXP BidiagPoly(SEXP, SEXP, SEXP);
 

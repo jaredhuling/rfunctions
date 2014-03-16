@@ -6,7 +6,7 @@ using namespace RcppEigen;
 
 
 //Lanczos Bidiagonalization
-RcppExport SEXP GKLBidiag(SEXP A, SEXP v, SEXP k)
+RcppExport SEXP GKLBidiag(SEXP A, SEXP v, SEXP k, SEXP reorthog)
 {
   using namespace Rcpp;
   using namespace RcppEigen;
@@ -21,7 +21,7 @@ RcppExport SEXP GKLBidiag(SEXP A, SEXP v, SEXP k)
     const MapMatd AA(as<MapMatd>(A));
     const MapVecd Vinit(as<MapVecd>(v));
     const int kk(as<int>(k));
-    //const bool reorth(as<bool>(reorthog));
+    const int reorth(as<int>(reorthog));
     
     VectorXd v(Vinit);
     VectorXd u(AA.rows());
@@ -29,25 +29,50 @@ RcppExport SEXP GKLBidiag(SEXP A, SEXP v, SEXP k)
     VectorXd Vnew(v.size());
     MatrixXd B(MatrixXd::Zero(kk, kk));
     double d(0);
-    //VectorXd Unew(v.size());
+    MatrixXd VV(v.size(), kk);
     
     v.normalize();
+    if (reorth == 1) {
+      VV.col(0) = v;
+    }
     
     VectorXd beta(kk);
     VectorXd alpha(kk);
     
     for (int i = 0; i < kk; i++) {
       Uprev = u;
-      u = AA * v;
+      
+      if (reorth == 1) {
+        u = AA * VV.col(i);
+      } else {
+        u = AA * v;
+      }
       if (i > 0) {
         u -= beta(i - 1) * Uprev;
         //add reorthogonalization
       }
       alpha(i) = u.norm();
       u /= alpha(i);
-      Vnew = AA.adjoint() * u - alpha(i) * v;
+      Vnew = AA.adjoint() * u;
+      if (reorth == 1) {
+        Vnew = Vnew - alpha(i) * VV.col(i);
+        Vnew = Vnew - VV.leftCols(i) * (VV.leftCols(i).adjoint() * Vnew);
+      } else {
+        Vnew = Vnew - alpha(i) * v;
+      }
       beta(i) = Vnew.norm();
-      v = Vnew.array() / beta(i);
+      if (i + 1 < kk) {
+        if (reorth == 1) {
+          VV.col(i+1) = Vnew.array() / beta(i);
+        } else {
+          v = Vnew.array() / beta(i);
+        }
+      }
+      
+    }
+    
+    if (reorth == 1) {
+      v = VV.col(kk - 1);
     }
     
     B.diagonal() = alpha;
@@ -72,7 +97,7 @@ RcppExport SEXP GKLBidiag(SEXP A, SEXP v, SEXP k)
 }
 
 //Lanczos Bidiagonalization for Sparse Matrices
-RcppExport SEXP GKLBidiagSparse(SEXP A, SEXP v, SEXP k)
+RcppExport SEXP GKLBidiagSparse(SEXP A, SEXP v, SEXP k, SEXP reorthog)
 {
   using namespace Rcpp;
   using namespace RcppEigen;
@@ -92,7 +117,7 @@ RcppExport SEXP GKLBidiagSparse(SEXP A, SEXP v, SEXP k)
     const SpMat AA(as<MSpMat>(A));
     const MapVecd Vinit(as<MapVecd>(v));
     const int kk(as<int>(k));
-    //const bool reorth(as<bool>(reorthog));
+    const int reorth(as<int>(reorthog));
     
     VectorXd v(Vinit);
     VectorXd u(AA.rows());
@@ -100,25 +125,50 @@ RcppExport SEXP GKLBidiagSparse(SEXP A, SEXP v, SEXP k)
     VectorXd Vnew(v.size());
     MatrixXd B(MatrixXd::Zero(kk, kk));
     double d(0);
-    //VectorXd Unew(v.size());
+    MatrixXd VV(v.size(), kk);
     
     v.normalize();
+    if (reorth == 1) {
+      VV.col(0) = v;
+    }
         
     VectorXd beta(kk);
     VectorXd alpha(kk);
     
-    for (int i = 0; i < kk; i++) {
+for (int i = 0; i < kk; i++) {
       Uprev = u;
-      u = AA * v;
+      
+      if (reorth == 1) {
+        u = AA * VV.col(i);
+      } else {
+        u = AA * v;
+      }
       if (i > 0) {
         u -= beta(i - 1) * Uprev;
         //add reorthogonalization
       }
       alpha(i) = u.norm();
       u /= alpha(i);
-      Vnew = AA.adjoint() * u - alpha(i) * v;
+      Vnew = AA.adjoint() * u;
+      if (reorth == 1) {
+        Vnew = Vnew - alpha(i) * VV.col(i);
+        Vnew = Vnew - VV.leftCols(i) * (VV.leftCols(i).adjoint() * Vnew);
+      } else {
+        Vnew = Vnew - alpha(i) * v;
+      }
       beta(i) = Vnew.norm();
-      v = Vnew.array() / beta(i);
+      if (i + 1 < kk) {
+        if (reorth == 1) {
+          VV.col(i+1) = Vnew.array() / beta(i);
+        } else {
+          v = Vnew.array() / beta(i);
+        }
+      }
+      
+    }
+    
+    if (reorth == 1) {
+      v = VV.col(kk - 1);
     }
     
     B.diagonal() = alpha;
