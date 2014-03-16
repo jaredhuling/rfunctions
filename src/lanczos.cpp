@@ -16,8 +16,8 @@ RcppExport SEXP GKLBidiag(SEXP A, SEXP v, SEXP k)
     using Eigen::MatrixXd;
     using Eigen::VectorXd;
     using Eigen::JacobiSVD;
-    typedef Eigen::Map<VectorXd> MapVecd;
-    typedef Eigen::Map<Eigen::MatrixXd> MapMatd;
+    typedef Map<VectorXd> MapVecd;
+    typedef Map<Eigen::MatrixXd> MapMatd;
     const MapMatd AA(as<MapMatd>(A));
     const MapVecd Vinit(as<MapVecd>(v));
     const int kk(as<int>(k));
@@ -82,13 +82,13 @@ RcppExport SEXP GKLBidiagSparse(SEXP A, SEXP v, SEXP k)
     using Eigen::MatrixXd;
     using Eigen::MappedSparseMatrix;
     using Eigen::SparseMatrix;
-    typedef Eigen::MappedSparseMatrix<double> MSpMat;
-    typedef Eigen::SparseMatrix<double> SpMat;
-    
     using Eigen::VectorXd;
     using Eigen::JacobiSVD;
-    typedef Eigen::Map<VectorXd> MapVecd;
-    typedef Eigen::Map<Eigen::MatrixXd> MapMatd;
+    typedef MappedSparseMatrix<double> MSpMat;
+    typedef SparseMatrix<double> SpMat;
+    typedef Map<VectorXd> MapVecd;
+    typedef Map<MatrixXd> MapMatd;
+    
     const SpMat AA(as<MSpMat>(A));
     const MapVecd Vinit(as<MapVecd>(v));
     const int kk(as<int>(k));
