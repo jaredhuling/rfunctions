@@ -1,5 +1,5 @@
 
-#include "utils.h"
+#include "linop.h"
 
 using namespace Rcpp;
 using namespace RcppEigen;

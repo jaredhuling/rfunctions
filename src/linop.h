@@ -1,5 +1,5 @@
-#ifndef _rfunctions_UTILS_H
-#define _rfunctions_UTILS_H
+#ifndef _rfunctions_LINOP_H
+#define _rfunctions_LINOP_H
 
 #include <Rcpp.h>
 #include <RcppEigen.h>

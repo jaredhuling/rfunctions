@@ -44,5 +44,4 @@ weights <- runif(n.obs)
 xpwx <- crossprodcpp(x, weights)
 
 
-
 }

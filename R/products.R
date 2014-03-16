@@ -19,9 +19,11 @@
 #'
 #'## compute X'WX
 #'xpwx <- crossprodcpp(x, weights)
-crossprodcpp <- function(x, w = NULL) {
-  .Call("crossprodcpp", X = x, PACKAGE = "rfunctions")
-}
+setGeneric("crossprodcpp", function(x, w = NULL) crossprod(x))
+
+#crossprodcpp <- function(x, w = NULL) {
+#  .Call("crossprodcpp", X = x, PACKAGE = "rfunctions")
+#}
 
 setMethod("crossprodcpp", signature(x = "dgeMatrix", w = "missing"),
           function(x) .Call("crossprodcpp", X = x, PACKAGE = "rfunctions"),
