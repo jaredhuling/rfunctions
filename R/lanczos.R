@@ -5,7 +5,7 @@
 #' @param x matrix input
 #' @param v numeric vector. Initialize GKL bidiagonalization with random vector on unit sphere
 #' @param maxit integer. Maximum number of Lanczos iterations
-#' @param reorthog. Takes values in 0:2. 0 for no reorthogonalization, 1 for reorthogonalization of 
+#' @param reorthog Takes values in 0:2. 0 for no reorthogonalization, 1 for reorthogonalization of 
 #' V vectors (slower, more accurate), 2 for reorthogonalization of V and U vectors (slowest and most 
 #' memory, most accurate. Not implemented yet)
 #' @param upper.bound.prob upper bound probability for the largest singular value

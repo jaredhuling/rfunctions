@@ -13,7 +13,7 @@ gklBidiag(x, v, maxit, reorthog = 0, upper.bound.prob = NULL)
   \item{maxit}{integer. Maximum number of Lanczos
   iterations}
 
-  \item{reorthog.}{Takes values in 0:2. 0 for no
+  \item{reorthog}{Takes values in 0:2. 0 for no
   reorthogonalization, 1 for reorthogonalization of V
   vectors (slower, more accurate), 2 for
   reorthogonalization of V and U vectors (slowest and most
@@ -37,5 +37,11 @@ x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
 ## compute largest singular value of x
 lanczos <- gklBidiag(x, runif(ncol(x)), 10L, 0.99)
 str(lanczos)
+}
+\references{
+Hochstenbach (2013) Probabilistic upper bounds for the
+matrix two-norm,
+http://link.springer.com/article/10.1007/s10915-013-9716-x
+Journal of Scientific Computing, Vol. 57(3), Dec. 2013
 }
 

@@ -1,6 +1,6 @@
 \name{runParallel}
 \alias{runParallel}
-\title{Initialized parallel workers}
+\title{Initialize parallel workers}
 \usage{
 runParallel(ncores = 1L)
 }
@@ -11,7 +11,7 @@ runParallel(ncores = 1L)
 cluster object
 }
 \description{
-Initialized parallel workers
+Initialize parallel workers
 }
 \examples{
 cl <- runParallel(ncores = 4L)

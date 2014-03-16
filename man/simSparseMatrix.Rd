@@ -1,6 +1,6 @@
 \name{simSparseMatrix}
 \alias{simSparseMatrix}
-\title{Compute Largest Singular Value of Matrix x}
+\title{Simulate a matrix with very few nonzero entries}
 \usage{
 simSparseMatrix(sparsity, dim, boolean = T, slam = F)
 }
@@ -22,7 +22,7 @@ simSparseMatrix(sparsity, dim, boolean = T, slam = F)
 SparseMatrix or simple_triplet_matrix
 }
 \description{
-Compute Largest Singular Value of Matrix x
+Simulate a matrix with very few nonzero entries
 }
 \examples{
 n.obs <- 1e5
