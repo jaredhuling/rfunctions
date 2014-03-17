@@ -23,10 +23,14 @@
 #'lanczos <- gklBidiag(x, runif(ncol(x)), 10L, reorth = 0, upper.bound.prob = 0.99)
 #'str(lanczos)
 setGeneric("gklBidiag", function(x, v, maxit, reorthog = 0, upper.bound.prob = NULL) {
-  stopifnot(is.numeric(x))
+  stopifnot(is.numeric(x) | inherits(x, "CsparseMatrix"))
   stopifnot(is.numeric(v))
   reorthog <- as.integer(reorthog)
-  .Call("GKLBidiag", A = x, v = v, k = maxit, reorthog = reorthog, PACKAGE = "rfunctions")
+  if (inherits(x, "CsparseMatrix")) {
+    .Call("GKLBidiagSparse", A = x, v = v, k = maxit, reorthog = reorthog, PACKAGE = "rfunctions")
+  } else {
+    .Call("GKLBidiag", A = x, v = v, k = maxit, reorthog = reorthog, PACKAGE = "rfunctions")
+  }
 })
 
 setMethod("gklBidiag", signature(x = "matrix", v = "numeric", maxit = "numeric", 
