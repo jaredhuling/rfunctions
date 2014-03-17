@@ -20,7 +20,7 @@
 #'x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
 #'
 #'## compute largest singular value of x
-#'lanczos <- gklBidiag(x, runif(ncol(x)), 10L, 0.99)
+#'lanczos <- gklBidiag(x, runif(ncol(x)), 10L, reorth = 0, upper.bound.prob = 0.99)
 #'str(lanczos)
 setGeneric("gklBidiag", function(x, v, maxit, reorthog = 0, upper.bound.prob = NULL) {
   stopifnot(is.numeric(x))
