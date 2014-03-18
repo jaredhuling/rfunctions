@@ -16,7 +16,7 @@ library(rfunctions)
 
 ## Accelerated crossprod function
 
-A project I've been working on requires fast evaluation of **X'X** for a design matrix **X**. I found a great example in the [paper](http://www.jstatsoft.org/v52/i05/paper) for [RcppEigen](http://cran.r-project.org/web/packages/RcppEigen/index.html) by Douglas Bates and Dirk Eddelbuettel for just such a thing. **RcppEigen** provides a simple and effective interfact between R and the blazing-fast **Eigen** C++ library for numerical linear algebra. Their example uses **inline**, a nice tool for inline C++ code in R, and I a made a proper **R** function from that. The following showcases the speed of **Eigen**. Note that since **X'X** is symmetric, we only have to compute half of the values, which further reduces computation time. 
+A project I've been working on requires fast evaluation of **X'X** for a design matrix **X**. I found a great example in the [paper](http://www.jstatsoft.org/v52/i05/paper) for [RcppEigen](http://cran.r-project.org/web/packages/RcppEigen/index.html) by Douglas Bates and Dirk Eddelbuettel for just such a thing. **RcppEigen** provides a simple and effective interface between R and the blazing-fast **Eigen** C++ library for numerical linear algebra. Their example uses **inline**, a nice tool for inline C++ code in R, and I a made a proper **R** function from that. The following showcases the speed of **Eigen**. Note that since **X'X** is symmetric, we only have to compute half of the values, which further reduces computation time. 
 
 
 ```r
