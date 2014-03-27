@@ -156,7 +156,7 @@ gklBidiag(x.s.c, v, maxit = 10L, 0L)$d
 
 ## Fast Moore-Penrose Generalized Inverse
 
-The speed of ```MASS::ginv()``` leaves much to be desired, as it calls ```svd()``` in order to compute the Moore-Penrose generalized inverse of a matrix. I came across this [paper](), which provides a faster algorithm for the M-P inverse. I've implemented it using RcppEigen. This is useful for least squares problems when the matrix is less than full rank, like below
+The speed of ```MASS::ginv()``` leaves much to be desired, as it calls ```svd()``` in order to compute the Moore-Penrose generalized inverse of a matrix. I came across this [paper](http://arxiv.org/ftp/arxiv/papers/0804/0804.4809.pdf), which provides a faster algorithm for the M-P inverse. I've implemented it using RcppEigen. This is useful for least squares problems when the matrix is less than full rank, like below
 
 
 ```r
