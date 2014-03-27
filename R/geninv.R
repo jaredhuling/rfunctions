@@ -11,7 +11,7 @@
 #'n <- 1000
 #'p <- 500
 #'
-#'x <- matrix(rnorm(n * (p - 1)), n, p)
+#'x <- matrix(rnorm(n * (p - 1)), n, p-1)
 #'x <- cbind(x, rowMeans(x))
 #'
 #'## compute X'X

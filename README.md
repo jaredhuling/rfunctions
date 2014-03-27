@@ -33,8 +33,8 @@ microbenchmark(crossprodcpp(x), crossprod(x), times = 25L)
 ```
 ## Unit: milliseconds
 ##             expr   min    lq median    uq   max neval
-##  crossprodcpp(x) 11.53 11.84  12.23 13.02 17.37    25
-##     crossprod(x) 51.39 52.70  55.06 56.78 61.04    25
+##  crossprodcpp(x) 11.88 13.09  15.33 16.82 19.34    25
+##     crossprod(x) 51.32 56.07  60.98 62.41 72.67    25
 ```
 
 ```r
@@ -58,9 +58,9 @@ microbenchmark(crossprodcpp(x, weights), crossprod(x, weights * x), times = 25L)
 
 ```
 ## Unit: milliseconds
-##                       expr    min    lq median     uq    max neval
-##   crossprodcpp(x, weights)  15.67  16.2  16.45  16.57  17.68    25
-##  crossprod(x, weights * x) 101.16 105.7 107.18 109.19 122.84    25
+##                       expr    min     lq median    uq    max neval
+##   crossprodcpp(x, weights)  15.93  16.34  16.68  17.2  24.61    25
+##  crossprod(x, weights * x) 105.36 106.59 110.08 113.9 134.62    25
 ```
 
 ```r
@@ -128,9 +128,9 @@ microbenchmark(gklBidiag(x.s.b, v, maxit = 10L, 0L), gklBidiag(x.s.c, v, maxit =
 
 ```
 ## Unit: milliseconds
-##                                  expr   min    lq median    uq    max
-##  gklBidiag(x.s.b, v, maxit = 10L, 0L) 81.31 82.32  82.81 83.71  94.72
-##  gklBidiag(x.s.c, v, maxit = 10L, 0L) 80.92 82.53  83.14 84.14 106.05
+##                                  expr   min    lq median     uq   max
+##  gklBidiag(x.s.b, v, maxit = 10L, 0L) 82.95 84.54  85.59  92.48 246.8
+##  gklBidiag(x.s.c, v, maxit = 10L, 0L) 83.21 85.00  87.00 101.99 243.1
 ##  neval
 ##    100
 ##    100
@@ -150,7 +150,7 @@ gklBidiag(x.s.c, v, maxit = 10L, 0L)$d
 ```
 
 ```
-## [1] 35.25
+## [1] 35.29
 ```
 
 
@@ -163,7 +163,7 @@ The speed of ```MASS::ginv()``` leaves much to be desired, as it calls ```svd()`
 n <- 1000
 p <- 500
 
-x <- matrix(rnorm(n * (p - 1)), n, p)
+x <- matrix(rnorm(n * (p - 1)), n, p - 1)
 x <- cbind(x, rowMeans(x))
 
 ## compute X'X
@@ -178,8 +178,8 @@ microbenchmark(geninv(xpx), ginv(xpx))
 ```
 ## Unit: milliseconds
 ##         expr   min    lq median    uq   max neval
-##  geninv(xpx) 186.4 189.0  190.8 195.1 227.1   100
-##    ginv(xpx) 501.2 510.7  517.5 523.4 550.9   100
+##  geninv(xpx) 185.9 190.4  192.1 199.6 256.2   100
+##    ginv(xpx) 498.7 511.6  522.2 534.7 711.0   100
 ```
 
 ```r
@@ -211,28 +211,31 @@ This may seem pointless, but I wrote functions to add and subtract matrices. It 
 
 
 ```r
+n.obs <- 1e+05
+n.vars <- 500
+
 A <- simSparseMatrix(sparsity = 0.99, dim = c(n.obs, n.vars), boolean = F)
 B <- simSparseMatrix(sparsity = 0.99, dim = c(n.obs, n.vars), boolean = F)
 
-microbenchmark(add(A, B), A + B)
+microbenchmark(add(A, B), A + B, times = 25L)
 ```
 
 ```
 ## Unit: milliseconds
-##       expr    min     lq median    uq max neval
-##  add(A, B)  78.31  80.31  81.74  90.2 200   100
-##      A + B 210.79 238.46 335.76 340.6 362   100
+##       expr   min     lq median     uq   max neval
+##  add(A, B) 37.59  40.08  40.93  44.32 161.2    25
+##      A + B 92.69 100.69 105.72 110.32 218.2    25
 ```
 
 ```r
-microbenchmark(subtract(A, B), A - B)
+microbenchmark(subtract(A, B), A - B, times = 25L)
 ```
 
 ```
 ## Unit: milliseconds
-##            expr   min     lq median     uq   max neval
-##  subtract(A, B)  78.3  80.28  81.66  85.69 104.8   100
-##           A - B 215.0 339.42 343.98 349.33 378.6   100
+##            expr   min    lq median    uq   max neval
+##  subtract(A, B) 37.42 39.22  40.22  45.8 155.2    25
+##           A - B 94.09 97.81 108.23 112.1 120.9    25
 ```
 
 ```r
@@ -269,8 +272,8 @@ microbenchmark(add(A, B), A + B)
 ```
 ## Unit: milliseconds
 ##       expr   min    lq median    uq   max neval
-##  add(A, B) 5.008 6.355  6.453 6.628 25.57   100
-##      A + B 1.734 3.093  3.172 3.271 17.04   100
+##  add(A, B) 4.801 6.286  6.432 7.201 24.76   100
+##      A + B 1.677 3.018  3.207 3.472 19.32   100
 ```
 
 ```r
@@ -280,8 +283,8 @@ microbenchmark(subtract(A, B), A - B)
 ```
 ## Unit: milliseconds
 ##            expr   min    lq median    uq   max neval
-##  subtract(A, B) 4.988 6.286  6.479 6.727 18.48   100
-##           A - B 1.728 3.127  3.192 3.278 17.50   100
+##  subtract(A, B) 4.838 6.260  6.347 6.512 19.38   100
+##           A - B 1.845 2.996  3.054 3.198 20.56   100
 ```
 
 ```r
