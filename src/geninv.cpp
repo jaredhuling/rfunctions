@@ -61,9 +61,9 @@ RcppExport SEXP geninv(SEXP GG)
     MatrixXd Y(MatrixXd(m, n));
     
     if (transp) {
-      Y = G.adjoint() * L * M * M * L.adjoint();
+      Y = G.adjoint() * L.block(0, 0, mn, r) * M * M * L.block(0, 0, mn, r).adjoint();
     } else {
-      Y = L * M * M * L.adjoint() * G.adjoint();
+      Y = L.block(0, 0, mn, r) * M * M * L.block(0, 0, mn, r).adjoint() * G.adjoint();
     }
 
     return wrap(Y);
