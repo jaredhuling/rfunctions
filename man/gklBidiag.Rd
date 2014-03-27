@@ -35,7 +35,7 @@ n.vars <- 150
 x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
 
 ## compute largest singular value of x
-lanczos <- gklBidiag(x, runif(ncol(x)), 10L, 0.99)
+lanczos <- gklBidiag(x, runif(ncol(x)), 10L, reorth = 0, upper.bound.prob = 0.99)
 str(lanczos)
 }
 \references{
