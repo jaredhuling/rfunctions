@@ -13,6 +13,7 @@
 using namespace Rcpp;
 using namespace RcppEigen;
 
+inline Eigen::ArrayXd Dplus(const Eigen::ArrayXd& d);
 
 RcppExport SEXP crossprodcpp(SEXP);
 
@@ -25,5 +26,7 @@ RcppExport SEXP addcpp(SEXP, SEXP);
 RcppExport SEXP subSparsecpp(SEXP, SEXP);
 
 RcppExport SEXP addSparsecpp(SEXP, SEXP);
+
+RcppExport SEXP fastRank(SEXP);
 
 #endif

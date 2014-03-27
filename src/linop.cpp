@@ -1,5 +1,6 @@
 
 #include "linop.h"
+#include "utils.h"
 
 using namespace Rcpp;
 using namespace RcppEigen;
@@ -135,4 +136,41 @@ RcppExport SEXP addSparsecpp(SEXP BB, SEXP CC)
   }
   return R_NilValue; //-Wall
 }
+
+inline Eigen::ArrayXd Dplus(const Eigen::ArrayXd& d) {
+  Eigen::ArrayXd di(d.size());
+  double comp(d.maxCoeff() * std::numeric_limits<double>::epsilon() * d.size());
+  for (int j = 0; j < d.size(); ++j) di[j] = (d[j] < comp) ? 0. : 1./d[j];
+  return di;
+}
+
+
+//port fast matrix rank function
+RcppExport SEXP fastRank(SEXP AA)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::Lower;
+    using Eigen::Upper;
+    using Eigen::VectorXd;
+
+    typedef Eigen::Map<Eigen::MatrixXd> MapMatd;
+    const MapMatd A(as<MapMatd>(AA));
+    
+    const Eigen::SelfAdjointEigenSolver<MatrixXd> VLV(xtx(A).selfadjointView<Lower>());
+    const Eigen::ArrayXd Dp(Dplus(VLV.eigenvalues()).sqrt());
+    const int r((Dp > 0).count());
+    
+    return wrap(r);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
 

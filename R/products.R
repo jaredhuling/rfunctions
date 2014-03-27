@@ -87,3 +87,12 @@ crossprodChunk <- function(X, row.chunk = NULL, sparse = FALSE){
   }
   as(new.B, "matrix")
 }
+
+
+#call fast matrix rank function
+fastRank <- function(M) {
+  stopifnot(inherits(M, "matrix"))
+  stopifnot(is.numeric(M))
+  .Call("fastRank", AA = M, PACKAGE = "rfunctions")
+}
+

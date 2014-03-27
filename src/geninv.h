@@ -15,6 +15,6 @@
 
 RcppExport SEXP geninv(SEXP);
 
-
+RcppExport SEXP ginv(SEXP);
 
 #endif

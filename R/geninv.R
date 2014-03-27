@@ -23,5 +23,7 @@
 #'## check if we have computed a generalized inverse
 #'all.equal(xpx, xpx %*% inv %*% xpx)
 geninv <- function(A) {
+  stopifnot(inherits(A, "matrix"))
+  stopifnot(is.numeric(A))
   .Call("geninv", GG = A, PACKAGE = "rfunctions")
 }
