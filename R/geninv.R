@@ -1,0 +1,27 @@
+
+
+#' Compute Moore-Penrose generalized inverse of a matrix
+#'
+#' @param A matrix 
+#' @return The pseudoinverse of matrix A.
+#' @references Courrieu (2005) Fast Computation of Moore-Penrose Inverse Matrices, http://arxiv.org/ftp/arxiv/papers/0804/0804.4809.pdf 
+#' Neural Information Processing - Letters and Reviews, Vol. 8(2), Aug. 2005
+#' @export
+#' @examples
+#'n <- 1000
+#'p <- 500
+#'
+#'x <- matrix(rnorm(n * (p - 1)), n, p)
+#'x <- cbind(x, rowMeans(x))
+#'
+#'## compute X'X
+#'xpx <- crossprodcpp(x)
+#'
+#'## compute generalized inverse of X'X
+#'inv <- geninv(xpx)
+#'
+#'## check if we have computed the M-P generalized inverse
+#'all.equal(xpx, xpx %*% inv %*% xpx)
+geninv <- function(A) {
+  .Call("geninv", GG = A, PACKAGE = "rfunctions")
+}
