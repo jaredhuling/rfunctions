@@ -33,8 +33,8 @@ microbenchmark(crossprodcpp(x), crossprod(x), times = 25L)
 ```
 ## Unit: milliseconds
 ##             expr   min    lq median    uq   max neval
-##  crossprodcpp(x) 11.35 11.64  11.83 12.04 16.19    25
-##     crossprod(x) 50.44 50.94  52.26 52.72 57.36    25
+##  crossprodcpp(x) 11.53 11.84  12.23 13.02 17.37    25
+##     crossprod(x) 51.39 52.70  55.06 56.78 61.04    25
 ```
 
 ```r
@@ -58,9 +58,9 @@ microbenchmark(crossprodcpp(x, weights), crossprod(x, weights * x), times = 25L)
 
 ```
 ## Unit: milliseconds
-##                       expr    min     lq median     uq    max neval
-##   crossprodcpp(x, weights)  15.34  15.93  16.04  16.34  18.98    25
-##  crossprod(x, weights * x) 102.98 105.23 106.27 113.21 193.27    25
+##                       expr    min    lq median     uq    max neval
+##   crossprodcpp(x, weights)  15.67  16.2  16.45  16.57  17.68    25
+##  crossprod(x, weights * x) 101.16 105.7 107.18 109.19 122.84    25
 ```
 
 ```r
@@ -128,9 +128,12 @@ microbenchmark(gklBidiag(x.s.b, v, maxit = 10L, 0L), gklBidiag(x.s.c, v, maxit =
 
 ```
 ## Unit: milliseconds
-##                                  expr   min    lq median    uq   max neval
-##  gklBidiag(x.s.b, v, maxit = 10L, 0L) 80.49 81.61  82.05 83.10 109.9   100
-##  gklBidiag(x.s.c, v, maxit = 10L, 0L) 80.42 81.45  81.91 82.97 118.6   100
+##                                  expr   min    lq median    uq    max
+##  gklBidiag(x.s.b, v, maxit = 10L, 0L) 81.31 82.32  82.81 83.71  94.72
+##  gklBidiag(x.s.c, v, maxit = 10L, 0L) 80.92 82.53  83.14 84.14 106.05
+##  neval
+##    100
+##    100
 ```
 
 ```r
@@ -147,11 +150,62 @@ gklBidiag(x.s.c, v, maxit = 10L, 0L)$d
 ```
 
 ```
-## [1] 35.37
+## [1] 35.25
 ```
 
 
-##Faster Addition/Subtraction of Matrices
+## Fast Moore-Penrose Generalized Inverse
+
+The speed of ```MASS::ginv()``` leaves much to be desired, as it called ```svd()``` in order to compute the Moore-Penrose generalized inverse of a matrix. I came across this [paper](), which provides a faster algorithm for the M-P inverse. I've implemented it using RcppEigen. This is useful for least squares problems when the matrix is less than full rank, like below
+
+
+```r
+n <- 1000
+p <- 500
+
+x <- matrix(rnorm(n * (p - 1)), n, p)
+x <- cbind(x, rowMeans(x))
+
+## compute X'X
+xpx <- crossprodcpp(x)
+
+library(MASS)
+
+## compute generalized inverse of X'X
+microbenchmark(geninv(xpx), ginv(xpx))
+```
+
+```
+## Unit: milliseconds
+##         expr   min    lq median    uq   max neval
+##  geninv(xpx) 186.4 189.0  190.8 195.1 227.1   100
+##    ginv(xpx) 501.2 510.7  517.5 523.4 550.9   100
+```
+
+```r
+
+
+inv <- geninv(xpx)
+inv2 <- ginv(xpx)
+
+## check if we have computed the M-P generalized inverse
+all.equal(xpx, xpx %*% inv %*% xpx)
+```
+
+```
+## [1] TRUE
+```
+
+```r
+all.equal(inv, inv2)
+```
+
+```
+## [1] TRUE
+```
+
+
+## Faster Addition/Subtraction of Matrices
 
 This may seem pointless, but I wrote functions to add and subtract matrices. It turns out my functions are faster than using the ```+``` and ```-``` operators. I'm sure someone will be quick to point out why using my ```add()``` and ```subtract()``` functions is silly and a bad idea.
 
@@ -165,9 +219,9 @@ microbenchmark(add(A, B), A + B)
 
 ```
 ## Unit: milliseconds
-##       expr    min     lq median     uq   max neval
-##  add(A, B)  77.15  79.07  80.05  88.85 191.2   100
-##      A + B 227.95 328.97 334.87 339.39 535.6   100
+##       expr    min     lq median    uq max neval
+##  add(A, B)  78.31  80.31  81.74  90.2 200   100
+##      A + B 210.79 238.46 335.76 340.6 362   100
 ```
 
 ```r
@@ -176,9 +230,9 @@ microbenchmark(subtract(A, B), A - B)
 
 ```
 ## Unit: milliseconds
-##            expr    min     lq median     uq   max neval
-##  subtract(A, B)  77.89  79.32  80.36  88.99 191.1   100
-##           A - B 217.89 250.13 338.79 342.60 360.1   100
+##            expr   min     lq median     uq   max neval
+##  subtract(A, B)  78.3  80.28  81.66  85.69 104.8   100
+##           A - B 215.0 339.42 343.98 349.33 378.6   100
 ```
 
 ```r
@@ -215,8 +269,8 @@ microbenchmark(add(A, B), A + B)
 ```
 ## Unit: milliseconds
 ##       expr   min    lq median    uq   max neval
-##  add(A, B) 6.044 6.347  6.425 6.566 24.74   100
-##      A + B 2.975 3.116  3.149 3.209 20.44   100
+##  add(A, B) 5.008 6.355  6.453 6.628 25.57   100
+##      A + B 1.734 3.093  3.172 3.271 17.04   100
 ```
 
 ```r
@@ -226,8 +280,8 @@ microbenchmark(subtract(A, B), A - B)
 ```
 ## Unit: milliseconds
 ##            expr   min    lq median    uq   max neval
-##  subtract(A, B) 6.060 6.331  6.432 6.596 22.09   100
-##           A - B 2.997 3.117  3.157 3.253 21.50   100
+##  subtract(A, B) 4.988 6.286  6.479 6.727 18.48   100
+##           A - B 1.728 3.127  3.192 3.278 17.50   100
 ```
 
 ```r
