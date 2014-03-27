@@ -1,6 +1,6 @@
 
 
-#' Compute Moore-Penrose generalized inverse of a matrix
+#' Compute The Moore-Penrose generalized inverse of a matrix
 #'
 #' @param A matrix 
 #' @return The pseudoinverse of matrix A.
@@ -20,7 +20,7 @@
 #'## compute generalized inverse of X'X
 #'inv <- geninv(xpx)
 #'
-#'## check if we have computed the M-P generalized inverse
+#'## check if we have computed a generalized inverse
 #'all.equal(xpx, xpx %*% inv %*% xpx)
 geninv <- function(A) {
   .Call("geninv", GG = A, PACKAGE = "rfunctions")
