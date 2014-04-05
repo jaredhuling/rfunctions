@@ -18,9 +18,7 @@ runParallel <- function(ncores = 1L){
            library(doSNOW)
            #library(doParallel)
            num.cores <- ifelse(is.null(ncores), detectCores() - 1, ncores)
-           cl <- makePSOCKcluster(max(1, num.cores)) #; registerDoSNOW(cl)
-           clusterCall(cl, worker.init)
-           registerDoParallel(cl)
+           cl <- makeCluster(max(1, num.cores)); registerDoSNOW(cl)
          },
          "Linux" = {
            library(doMC); registerDoMC()
