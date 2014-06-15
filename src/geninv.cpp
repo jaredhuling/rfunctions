@@ -169,17 +169,19 @@ RcppExport SEXP geninv_sparse(SEXP GG)
     
     bool transp(false);
     double tol(1.0e-10);
-    SpMat A(SpMat(mn, mn));
-    SpMat L(SpMat(mn, mn).setZero());
+    MatrixXd A(MatrixXd(mn, mn));
+    SpMat A_sparse(SpMat(mn, mn));
+    MatrixXd L(MatrixXd(mn, mn).setZero());
     
     
     
     if (n < m) {
       transp = true;
-      A = G * G.adjoint();
+      A_sparse = G * G.adjoint();
     } else {
-      A = G.adjoint() * G;
+      A_sparse = G.adjoint() * G;
     }
+    A = MatrixXd(A_sparse);
 
     int r = 0;
     for (int k = 0; k < mn; k++) {
@@ -203,7 +205,7 @@ RcppExport SEXP geninv_sparse(SEXP GG)
     }
 
     MatrixXd M(MatrixXd(r, r));
-    M = xtx(MatrixXd(L.block(0, 0, mn, r))).inverse();
+    M = xtx(L.block(0, 0, mn, r)).inverse();
 
     MatrixXd Y(MatrixXd(m, n));
     

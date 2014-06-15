@@ -2,7 +2,7 @@
 
 #' Compute The Moore-Penrose generalized inverse of a matrix
 #'
-#' @param A matrix 
+#' @param A matrix or CsparseMatrix
 #' @return The pseudoinverse of matrix A.
 #' @references Courrieu (2005) Fast Computation of Moore-Penrose Inverse Matrices, http://arxiv.org/ftp/arxiv/papers/0804/0804.4809.pdf 
 #' Neural Information Processing - Letters and Reviews, Vol. 8(2), Aug. 2005
