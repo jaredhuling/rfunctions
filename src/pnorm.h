@@ -9,13 +9,15 @@
 #include <algorithm> 
 #include <iostream>
 #include <cmath>
-#include <boost/random/normal_distribution.hpp> 
 #include <boost/math/distributions.hpp>
 
 
+using namespace Rcpp;
+using namespace RcppEigen;
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
+using Rcpp:wrap;
 
 VectorXd pnorm(const VectorXd& x);
 
