@@ -18,7 +18,7 @@ using namespace RcppEigen;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
-RcppExport SEXP pnorm(SEXP x);
+RcppExport SEXP pnorm(SEXP);
 
 
 #endif
