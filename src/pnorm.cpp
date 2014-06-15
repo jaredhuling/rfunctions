@@ -2,7 +2,9 @@
 
 #include "pnorm.h"
 
-RcppExport SEXP pnorm(SEXP x) {
+
+RcppExport SEXP ppnorm(SEXP x) 
+{
   using namespace Rcpp;
   using namespace RcppEigen;
   try {
