@@ -22,8 +22,12 @@
 #'
 #'## check if we have computed a generalized inverse
 #'all.equal(xpx, xpx %*% inv %*% xpx)
-geninv <- function(A) {
-  stopifnot(inherits(A, "matrix"))
-  stopifnot(is.numeric(A))
-  .Call("geninv", GG = A, PACKAGE = "rfunctions")
-}
+setGeneric("geninv", function(A) {
+  stopifnot(is.numeric(A) | inherits(A, "CsparseMatrix"))
+
+  if (inherits(A, "CsparseMatrix")) {
+    .Call("geninv_sparse", GG = A, PACKAGE = "rfunctions")
+  } else {
+    .Call("geninv", GG = A, PACKAGE = "rfunctions")
+  }
+})
