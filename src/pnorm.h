@@ -17,7 +17,7 @@
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
-VectorXd pnorm(const VectorXd& x)
+VectorXd pnorm(const VectorXd& x);
 
 
 #endif
