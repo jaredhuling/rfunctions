@@ -14,7 +14,7 @@ RcppExport SEXP pnorm(SEXP x) {
     
     const MapVecd xx(as<MapVecd>(x));
     const int n(xx.size());
-    VectorXd ret(VectorXd(n));
+    VectorXd ret(n);
     boost::math::normal_distribution<> std_normal(0.0, 1.0);
     
     for (int i = 0; i < n; i++) {
