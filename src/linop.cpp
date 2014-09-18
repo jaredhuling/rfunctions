@@ -174,3 +174,90 @@ RcppExport SEXP fastRank(SEXP AA)
 }
 
 
+
+//Biconjugate gradient stabilized method
+RcppExport SEXP BiCGSTAB_eigen(SEXP A, SEXP b, SEXP maxit, SEXP tol)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::VectorXd;
+    using Eigen::BiCGSTAB;
+    using Rcpp::List;
+    typedef Map<VectorXd> MapVecd;
+    typedef Map<Eigen::MatrixXd> MapMatd;
+    
+    const int maxiter(as<int>(maxit));
+    const double toler(as<double>(tol));
+    Eigen::Map<MatrixXd> AA(as<MapMatd>(A));
+    Eigen::Map<VectorXd> bb(as<MapVecd>(b));
+    
+    BiCGSTAB<MatrixXd > solver;
+     
+    const int n(AA.cols());
+    VectorXd solution(n);
+    
+    solver.setMaxIterations(maxiter);  
+    solver.setTolerance(toler);
+    
+    solver.compute(AA);
+    solution = solver.solve(bb);
+    
+    return List::create(Named("x") = solution,
+                        Named("iters") = solver.iterations(),
+                        Named("error") = solver.error());
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
+
+//Sparse Biconjugate gradient stabilized method
+RcppExport SEXP BiCGSTAB_sparse_eigen(SEXP A, SEXP b, SEXP maxit, SEXP tol)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::VectorXd;
+    using Eigen::BiCGSTAB;
+    using Eigen::MappedSparseMatrix;
+    using Eigen::SparseMatrix;
+    using Rcpp::List;
+    typedef MappedSparseMatrix<double> MSpMat;
+    typedef SparseMatrix<double> SpMat;
+    typedef Map<VectorXd> MapVecd;
+    typedef Map<Eigen::MatrixXd> MapMatd;
+    
+    const int maxiter(as<int>(maxit));
+    const double toler(as<double>(tol));
+    SpMat AA(as<MSpMat>(A));
+    MapVecd bb(as<MapVecd>(b));
+    
+    BiCGSTAB<SpMat > solver;
+     
+    const int n(AA.cols());
+    VectorXd solution(n);
+    
+    solver.setMaxIterations(maxiter);  
+    solver.setTolerance(toler);
+    
+    solver.compute(AA);
+    solution = solver.solve(bb);
+    
+    return List::create(Named("x") = solution,
+                        Named("iters") = solver.iterations(),
+                        Named("error") = solver.error());
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}

@@ -5,7 +5,7 @@
 geninv(A)
 }
 \arguments{
-  \item{A}{matrix}
+  \item{A}{matrix or CsparseMatrix}
 }
 \value{
 The pseudoinverse of matrix A.

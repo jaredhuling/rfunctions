@@ -29,4 +29,9 @@ RcppExport SEXP addSparsecpp(SEXP, SEXP);
 
 RcppExport SEXP fastRank(SEXP);
 
+RcppExport SEXP BiCGSTAB_eigen(SEXP, SEXP, SEXP, SEXP);
+
+RcppExport SEXP BiCGSTAB_sparse_eigen(SEXP, SEXP, SEXP, SEXP);
+
+
 #endif
