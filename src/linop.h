@@ -33,5 +33,8 @@ RcppExport SEXP BiCGSTAB_eigen(SEXP, SEXP, SEXP, SEXP);
 
 RcppExport SEXP BiCGSTAB_sparse_eigen(SEXP, SEXP, SEXP, SEXP);
 
+RcppExport SEXP conjugate_gradient_eigen(SEXP, SEXP, SEXP, SEXP);
+
+RcppExport SEXP conjugate_gradient_sparse_eigen(SEXP, SEXP, SEXP, SEXP);
 
 #endif
