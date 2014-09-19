@@ -4,7 +4,7 @@ setGeneric("solveEigen", function(A, b, maxit = 500L, tol = 1e-5, method = c("Bi
   stopifnot(is.numeric(A) | inherits(A, "CsparseMatrix"))
   stopifnot(is.numeric(b))
   method <- match.arg(method)
-  if (inherits(x, "CsparseMatrix")) {
+  if (inherits(A, "CsparseMatrix")) {
     switch(method, 
            BiCGSTAB = .Call("BiCGSTAB_sparse_eigen", A = A, b = b, maxit = maxit, tol = tol, PACKAGE = "rfunctions"),
            CG = .Call("conjugate_gradient_sparse_eigen", A = A, b = b, maxit = maxit, tol = tol, PACKAGE = "rfunctions"))
@@ -47,7 +47,7 @@ setGeneric("solveCG", function(A, b, maxit = 500L, tol = 1e-5) {
   p <- ncol(A)
   bl <- length(b)
   stopifnot(n == p & p == bl)
-  if (inherits(x, "CsparseMatrix")) {
+  if (inherits(A, "CsparseMatrix")) {
     stop("not supported yet")
     #switch(method, 
     #       BiCGSTAB = .Call("BiCGSTAB_sparse_eigen", A = A, b = b, maxit = maxit, tol = tol, PACKAGE = "rfunctions"),

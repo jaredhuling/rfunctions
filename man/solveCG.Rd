@@ -20,7 +20,7 @@ list
 Solve the linear system Ax = b using conjugate gradient
 }
 \examples{
-n <- 5000
+n <- 2000
 p <- 10
 lambda <- 0.1
 
