@@ -25,7 +25,7 @@ setGeneric("solveEigen", function(A, b, maxit = 500L, tol = 1e-5, method = c("Bi
 #' @return list
 #' @export
 #' @examples
-#'n <- 5000
+#'n <- 2000
 #'p <- 10
 #'lambda <- 0.1
 #'
