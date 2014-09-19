@@ -1,0 +1,38 @@
+\name{solveCG}
+\alias{solveCG}
+\title{Solve the linear system Ax = b using conjugate gradient}
+\usage{
+solveCG(A, b, maxit = 500L, tol = 1e-05)
+}
+\arguments{
+  \item{A}{square matrix input}
+
+  \item{b}{numeric vector.}
+
+  \item{maxit}{integer. Maximum number of iterations}
+
+  \item{tol}{tolerance level}
+}
+\value{
+list
+}
+\description{
+Solve the linear system Ax = b using conjugate gradient
+}
+\examples{
+n <- 5000
+p <- 10
+lambda <- 0.1
+
+set.seed(100)
+x <- matrix(rnorm(n * p), ncol = p)
+y <- x \%*\% rnorm(p) + rnorm(p)
+b <- y
+A <- tcrossprod(x) + lambda * diag(n)
+
+system.time(alpha.true <- solve(A, b))
+system.time(alpha.cg <- solveCG(A, b))
+
+max(abs(alpha.cg$x - alpha.true))
+}
+

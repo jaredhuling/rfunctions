@@ -1,6 +1,7 @@
-
+#include <iostream>
 #include "linop.h"
 #include "utils.h"
+#include "math.h"
 
 using namespace Rcpp;
 using namespace RcppEigen;
@@ -366,6 +367,7 @@ RcppExport SEXP conjugate_gradient(SEXP A, SEXP b, SEXP maxit, SEXP tol)
     using Eigen::MatrixXd;
     using Eigen::VectorXd;
     using Rcpp::List;
+    
     typedef Map<VectorXd> MapVecd;
     typedef Map<Eigen::MatrixXd> MapMatd;
     
@@ -379,30 +381,34 @@ RcppExport SEXP conjugate_gradient(SEXP A, SEXP b, SEXP maxit, SEXP tol)
     VectorXd r(n);
     VectorXd p(n);
     VectorXd Ap(n);
+    x.fill(0);
     
-    double rsold(0);
+    double rsold;
     double rsnew;
     double alpha;
+    int iters = maxiter; 
     
-    r = b; 
+    r = bb; 
     p = r;
+    rsold = r.squaredNorm();
     
-    for (int i = 0; i < maxit; i++) {
+    for (int i = 0; i < maxiter; i++) {
       Ap = AA * p;
-      alpha = rsold / (p.transpose() * AA * p);
-      x = x + alpha * p;
-      r = r - alpha * Ap;
+      alpha = rsold / (p.transpose() * Ap);
+      x = x + (alpha * p.array()).matrix();
+      r = r - (alpha * Ap.array()).matrix();
       rsnew = r.squaredNorm();
-      if (rsnew.sqrt() < tol) {
+      if (sqrt(rsnew) < toler) {
+        iters = i;
         break;
       }
-      p = r + (rsnew / rsold) * p;
+      p = r + ((rsnew / rsold) * p.array()).matrix();
+      rsold = rsnew;
     }
     
     
     return List::create(Named("x") = x,
-                        Named("iters") = solver.iterations(),
-                        Named("error") = solver.error());
+                        Named("iters") = iters);
   } catch (std::exception &ex) {
     forward_exception_to_r(ex);
   } catch (...) {
