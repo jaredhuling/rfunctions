@@ -55,7 +55,7 @@ setGeneric("solveCG", function(A, b, maxit = 500L, tol = 1e-5) {
   } else {
     stopifnot(is.matrix(A))
     CG = .Call("conjugate_gradient", A = A, b = b, maxit = maxit, tol = tol, PACKAGE = "rfunctions")
-    CG$x <- drop(x)
+    CG$x <- drop(CG$x)
     CG
   }
 })
