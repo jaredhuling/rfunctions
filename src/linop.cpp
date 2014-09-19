@@ -188,6 +188,7 @@ RcppExport SEXP BiCGSTAB_eigen(SEXP A, SEXP b, SEXP maxit, SEXP tol)
     using Eigen::MatrixXd;
     using Eigen::VectorXd;
     using Eigen::BiCGSTAB;
+    //using Eigen::IncompleteLUT;
     using Rcpp::List;
     typedef Map<VectorXd> MapVecd;
     typedef Map<Eigen::MatrixXd> MapMatd;
@@ -196,12 +197,13 @@ RcppExport SEXP BiCGSTAB_eigen(SEXP A, SEXP b, SEXP maxit, SEXP tol)
     const double toler(as<double>(tol));
     Eigen::Map<MatrixXd> AA(as<MapMatd>(A));
     Eigen::Map<VectorXd> bb(as<MapVecd>(b));
-    
-    BiCGSTAB<MatrixXd > solver;
+    //BiCGSTAB< MatrixXd,IncompleteLUT<double> > solver;
+    BiCGSTAB< MatrixXd > solver;
      
     const int n(AA.cols());
     VectorXd solution(n);
     
+    //solver.preconditioner().setFillfactor(7);
     solver.setMaxIterations(maxiter);  
     solver.setTolerance(toler);
     
@@ -343,6 +345,62 @@ RcppExport SEXP conjugate_gradient_sparse_eigen(SEXP A, SEXP b, SEXP maxit, SEXP
     solution = solver.solve(bb);
     
     return List::create(Named("x") = solution,
+                        Named("iters") = solver.iterations(),
+                        Named("error") = solver.error());
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
+
+// Conjugate gradient
+RcppExport SEXP conjugate_gradient(SEXP A, SEXP b, SEXP maxit, SEXP tol)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::VectorXd;
+    using Rcpp::List;
+    typedef Map<VectorXd> MapVecd;
+    typedef Map<Eigen::MatrixXd> MapMatd;
+    
+    const int maxiter(as<int>(maxit));
+    const double toler(as<double>(tol));
+    const Eigen::Map<MatrixXd> AA(as<MapMatd>(A));
+    const Eigen::Map<VectorXd> bb(as<MapVecd>(b));
+    
+    const int n(AA.cols());
+    VectorXd x(n);
+    VectorXd r(n);
+    VectorXd p(n);
+    VectorXd Ap(n);
+    
+    double rsold(0);
+    double rsnew;
+    double alpha;
+    
+    r = b; 
+    p = r;
+    
+    for (int i = 0; i < maxit; i++) {
+      Ap = AA * p;
+      alpha = rsold / (p.transpose() * AA * p);
+      x = x + alpha * p;
+      r = r - alpha * Ap;
+      rsnew = r.squaredNorm();
+      if (rsnew.sqrt() < tol) {
+        break;
+      }
+      p = r + (rsnew / rsold) * p;
+    }
+    
+    
+    return List::create(Named("x") = x,
                         Named("iters") = solver.iterations(),
                         Named("error") = solver.error());
   } catch (std::exception &ex) {
