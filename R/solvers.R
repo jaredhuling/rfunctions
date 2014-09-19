@@ -43,6 +43,10 @@ setGeneric("solveEigen", function(A, b, maxit = 500L, tol = 1e-5, method = c("Bi
 setGeneric("solveCG", function(A, b, maxit = 500L, tol = 1e-5) {
   stopifnot(is.numeric(A) | inherits(A, "CsparseMatrix"))
   stopifnot(is.numeric(b))
+  n <- nrow(A)
+  p <- ncol(A)
+  bl <- length(b)
+  stopifnot(n == p & p == bl)
   if (inherits(x, "CsparseMatrix")) {
     stop("not supported yet")
     #switch(method, 
