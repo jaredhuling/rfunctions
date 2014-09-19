@@ -41,7 +41,7 @@ setGeneric("solveEigen", function(A, b, maxit = 500L, tol = 1e-5, method = c("Bi
 #'
 #'max(abs(alpha.cg$x - alpha.true))
 setGeneric("solveCG", function(A, b, maxit = 500L, tol = 1e-5) {
-  stopifnot(is.numeric(A) | inherits(A, "CsparseMatrix"))
+  stopifnot(inherits(A, "matrix") | inherits(A, "CsparseMatrix"))
   stopifnot(is.numeric(b))
   n <- nrow(A)
   p <- ncol(A)
