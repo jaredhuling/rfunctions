@@ -8,5 +8,5 @@ Maintainer: Jared Huling <jaredhuling@gmail.com>
 Description: R functions that are useful or are fast. Most of the implementation is in C++, utilizing RcppEigen
 License: GPL-3
 Depends: methods
-Depends: Rcpp (>= 0.11.3), RcppEigen (>= 0.3.2.1.1), Matrix
+Depends: Rcpp (>= 0.10.2), RcppEigen (>= 0.3.2.1.1), Matrix
 LinkingTo: Rcpp, RcppEigen, BH
