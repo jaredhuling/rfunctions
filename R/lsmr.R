@@ -9,21 +9,20 @@
 #' @return list
 #' @export
 #' @examples
-#'n <- 2000
-#'p <- 10
-#'lambda <- 0.1
+#'n <- 10000
+#'p <- 100
 #'
 #'set.seed(100)
-#'x <- matrix(rnorm(n * p), ncol = p)
-#'y <- x %*% rnorm(p) + rnorm(p)
-
-#'b <- y
-#'A <- tcrossprod(x) + lambda * diag(n)
+#'x <- simSparseMatrix(0.8, boolean = FALSE, dim = c(n, p)) 
+#'b <- as.vector(x %*% rnorm(p) + rnorm(n))
 #'
-#'system.time(alpha.true <- solve(A, b))
-#'system.time(alpha.cg <- solveCG(A, b))
+#'A <- crossprod(x)
+#'xtb <- as.vector(crossprod(x, b))
 #'
-#'max(abs(alpha.cg$x - alpha.true))
+#'system.time( alpha.true <- solve(A, b) )
+#'system.time( alpha.lsmr <- lsmr(x, b) )
+#'
+#'max(abs(alpha.lsmr$x - alpha.true))
 setGeneric("lsmr", function(A, b, lambda = 0, atol = 1e-5, btol = 1e-5,
                             conlim = 1e18, maxit = 50L, localSize = 0) {
   stopifnot(inherits(A, "matrix") | inherits(A, "CsparseMatrix"))

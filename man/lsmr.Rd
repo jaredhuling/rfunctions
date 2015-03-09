@@ -23,19 +23,19 @@ list
 Solve the linear system Ax = b using lsmr
 }
 \examples{
-n <- 2000
-p <- 10
-lambda <- 0.1
+n <- 10000
+p <- 100
 
 set.seed(100)
-x <- matrix(rnorm(n * p), ncol = p)
-y <- x \%*\% rnorm(p) + rnorm(p)
-b <- y
-A <- tcrossprod(x) + lambda * diag(n)
+x <- simSparseMatrix(0.8, boolean = FALSE, dim = c(n, p))
+b <- as.vector(x \%*\% rnorm(p) + rnorm(n))
+
+A <- crossprod(x)
+xtb <- as.vector(crossprod(x, b))
 
 system.time(alpha.true <- solve(A, b))
-system.time(alpha.cg <- solveCG(A, b))
+system.time(alpha.lsmr <- lsmr(x, b ))
 
-max(abs(alpha.cg$x - alpha.true))
+max(abs(alpha.lsmr$x - alpha.true))
 }
 

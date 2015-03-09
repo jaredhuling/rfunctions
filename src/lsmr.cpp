@@ -209,8 +209,8 @@ RcppExport SEXP lsmr_sparse(SEXP A,        SEXP b,
       rhobar    = vec1.norm();
       cbar      = (cbar * rho) / rhobar;
       sbar      = thetanew / rhobar;
-      zeta      =   cbar * zetabar;
-      zetabar   = - sbar * zetabar;
+      zeta      =  cbar * zetabar;
+      zetabar   = -sbar * zetabar;
   
       // Update h, h_hat, x.
       hbar      = h.array() - (thetabar * rho / (rhoold * rhobarold)) * hbar.array();
@@ -220,12 +220,12 @@ RcppExport SEXP lsmr_sparse(SEXP A,        SEXP b,
       // Estimate of ||r||.
     
       // Apply rotation Qhat_{k,2k+1}.
-      betaacute =   chat * betadd;
-      betacheck = - shat * betadd;
+      betaacute =  chat * betadd;
+      betacheck = -shat * betadd;
   
       // Apply rotation Q_{k,k+1}.
-      betahat   =   c * betaacute;
-      betadd    = - s * betaacute;
+      betahat   =  c * betaacute;
+      betadd    = -s * betaacute;
         
       // Apply rotation Qtilde_{k-1}.
       // betad = betad_{k-1} here.
@@ -236,8 +236,8 @@ RcppExport SEXP lsmr_sparse(SEXP A,        SEXP b,
       ctildeold     = rhodold / rhotildeold;
       stildeold     = thetabar / rhotildeold;
       thetatilde    = stildeold * rhobar;
-      rhodold       =   ctildeold * rhobar;
-      betad         = - stildeold * betad + ctildeold * betahat;
+      rhodold       =  ctildeold * rhobar;
+      betad         = -stildeold * betad + ctildeold * betahat;
   
       // betad   = betad_k here.
       // rhodold = rhod_k  here.
