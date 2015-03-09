@@ -417,3 +417,363 @@ RcppExport SEXP conjugate_gradient(SEXP A, SEXP b, SEXP maxit, SEXP tol)
   return R_NilValue; //-Wall
 }
 
+
+// Conjugate gradient
+RcppExport SEXP ILU_prec_conjugate_gradient_sparse(SEXP A, SEXP b, SEXP maxit, SEXP tol)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::VectorXd;
+    using Eigen::MappedSparseMatrix;
+    using Eigen::SparseMatrix;
+    using Rcpp::List;
+    typedef MappedSparseMatrix<double> MSpMat;
+    typedef SparseMatrix<double> SpMat;
+    typedef Map<VectorXd> MapVecd;
+    typedef Map<Eigen::MatrixXd> MapMatd;
+    
+    const int maxiter(as<int>(maxit));
+    const double toler(as<double>(tol));
+    SpMat AA(as<MSpMat>(A));
+    const Eigen::Map<VectorXd> bb(as<MapVecd>(b));
+    
+    const int n(AA.cols());
+    VectorXd x(n);
+    VectorXd r(n);
+    VectorXd z(n);
+    VectorXd p(n);
+    VectorXd Ap(n);
+    x.fill(0);
+    
+    Eigen::IncompleteLUT<double> ILUTC;
+    ILUTC.setFillfactor(5);
+    ILUTC.compute(AA);
+    
+    double rsold;
+    double rsnew;
+    double alpha;
+    int iters = maxiter; 
+    
+    r = bb;
+    z = ILUTC.solve(r);
+    p = r;
+    rsold = r.dot(z);
+
+    for (int i = 0; i < maxiter; i++) {
+      Ap = AA * p;
+      alpha = rsold / (p.transpose() * Ap);
+      x = x + (alpha * p.array()).matrix();
+      r = r - (alpha * Ap.array()).matrix();
+      rsnew = r.squaredNorm();
+      if (sqrt(rsnew) < toler) {
+        iters = i;
+        break;
+      }
+      z = ILUTC.solve(r);
+      rsnew = r.dot(z);
+      p = r + ((rsnew / rsold) * p.array()).matrix();
+      rsold = rsnew;
+    }
+    
+    
+    return List::create(Named("x") = x,
+                        Named("iters") = iters);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
+
+// Conjugate gradient sparse
+RcppExport SEXP conjugate_gradient_sparse(SEXP A, SEXP b, SEXP maxit, SEXP tol)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::VectorXd;
+    using Rcpp::List;
+    using Eigen::MappedSparseMatrix;
+    using Eigen::SparseMatrix;
+    using Eigen::Upper;
+    typedef MappedSparseMatrix<double> MSpMat;
+    typedef SparseMatrix<double> SpMat;
+    typedef Map<VectorXd> MapVecd;
+    typedef Map<MatrixXd> MapMatd;
+    
+    const int maxiter(as<int>(maxit));
+    const double toler(as<double>(tol));
+    const SpMat AA(as<MSpMat>(A));
+    const Eigen::Map<VectorXd> bb(as<MapVecd>(b));
+    
+    const int n(AA.cols());
+    VectorXd x(n);
+    VectorXd r(n);
+    VectorXd p(n);
+    VectorXd Ap(n);
+    x.fill(0);
+    
+    double rsold;
+    double rsnew;
+    double alpha;
+    int iters = maxiter; 
+    
+    r = bb; 
+    p = r;
+    rsold = r.squaredNorm();
+    
+    for (int i = 0; i < maxiter; i++) {
+      Ap = AA * p;
+      alpha = rsold / (p.transpose() * Ap);
+      x = x + (alpha * p.array()).matrix();
+      r = r - (alpha * Ap.array()).matrix();
+      rsnew = r.squaredNorm();
+      if (sqrt(rsnew) < toler) {
+        iters = i;
+        break;
+      }
+      p = r + ((rsnew / rsold) * p.array()).matrix();
+      rsold = rsnew;
+    }
+    
+    
+    return List::create(Named("x") = x,
+                        Named("iters") = iters);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
+
+// block Conjugate gradient sparse
+RcppExport SEXP block_conjugate_gradient(SEXP A, SEXP b, SEXP maxit, SEXP tol)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::VectorXd;
+    using Rcpp::List;
+    using Eigen::MappedSparseMatrix;
+    using Eigen::SparseMatrix;
+    using Eigen::Upper;
+    typedef MappedSparseMatrix<double> MSpMat;
+    typedef SparseMatrix<double> SpMat;
+    typedef Map<VectorXd> MapVecd;
+    typedef Map<MatrixXd> MapMatd;
+    
+    const int maxiter(as<int>(maxit));
+    const double toler(as<double>(tol));
+    const Map<MatrixXd> AA(as<MapMatd>(A));
+    const MapMatd bb(as<MapMatd>(b));
+    //const MapMatd init_(as<MapMatd>(init));
+    
+    const int n(AA.cols());
+    const int pp(bb.cols());
+    MatrixXd x(MatrixXd(n, pp));
+    MatrixXd r(MatrixXd(n, pp));
+    //MatrixXd theQ(MatrixXd(n, n));
+    MatrixXd p(MatrixXd(n, pp));
+    MatrixXd Ap(MatrixXd(n, pp));
+    x.fill(0);
+    
+    MatrixXd rsold(MatrixXd(pp, pp));
+    MatrixXd rsnew(MatrixXd(pp, pp));
+    MatrixXd alpha(MatrixXd(pp, pp));
+    int iters = maxiter; 
+    
+    //MatrixXd RR;
+
+
+    //Eigen::ColPivHouseholderQR<MatrixXd> pqr(-bb);
+    
+
+    
+    //int m_r = pqr.rank();
+
+    // Q
+    //theQ = pqr.householderQ(); //.setLength(pqr.nonzeroPivots());
+    //r = theQ.leftCols(m_r);
+    r = -bb;
+
+    
+    // R
+    //RR = pqr.matrixQR().topRightCorner(m_r, m_r).triangularView<Upper>();
+
+    
+    p = -r;
+    //rsold = r.colwise().squaredNorm();
+    
+    rsold = xtx(r);
+    
+
+    
+    for (int i = 0; i < maxiter; i++) {
+      Ap = AA * p;
+      alpha = (p.transpose() * Ap).colPivHouseholderQr().solve(rsold);
+      x = x + p * alpha;
+      r = r + Ap * alpha;
+      //rsnew = r.colwise().squaredNorm();
+      rsnew = xtx(r);
+
+      if (sqrt(rsnew.diagonal().sum()) < toler) {
+        iters = i;
+        break;
+      }
+      p = -r + p * rsold.colPivHouseholderQr().solve(rsnew);
+      rsold = rsnew;
+    }
+    
+    
+    
+    return List::create(Named("x") = x, // x * RR, 
+                        Named("iters") = iters);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
+
+// block Conjugate gradient sparse
+RcppExport SEXP block_conjugate_gradient_sparse(SEXP A, SEXP b, SEXP maxit, SEXP tol)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::VectorXd;
+    using Rcpp::List;
+    using Eigen::MappedSparseMatrix;
+    using Eigen::SparseMatrix;
+    using Eigen::Upper;
+    typedef MappedSparseMatrix<double> MSpMat;
+    typedef SparseMatrix<double> SpMat;
+    typedef Map<VectorXd> MapVecd;
+    typedef Map<MatrixXd> MapMatd;
+    
+    const int maxiter(as<int>(maxit));
+    const double toler(as<double>(tol));
+    const SpMat AA(as<MSpMat>(A));
+    const MapMatd bb(as<MapMatd>(b));
+    //const MapMatd init_(as<MapMatd>(init));
+    
+    const int n(AA.cols());
+    const int pp(bb.cols());
+    MatrixXd x(MatrixXd(n, pp));
+    MatrixXd r(MatrixXd(n, pp));
+    //MatrixXd theQ(MatrixXd(n, n));
+    MatrixXd p(MatrixXd(n, pp));
+    MatrixXd Ap(MatrixXd(n, pp));
+    x.fill(0);
+    
+    MatrixXd rsold(MatrixXd(pp, pp));
+    MatrixXd rsnew(MatrixXd(pp, pp));
+    MatrixXd alpha(MatrixXd(pp, pp));
+    int iters = maxiter; 
+    
+    //MatrixXd RR;
+
+
+    //Eigen::ColPivHouseholderQR<MatrixXd> pqr(-bb);
+    
+
+    
+    //int m_r = pqr.rank();
+
+    // Q
+    //theQ = pqr.householderQ(); //.setLength(pqr.nonzeroPivots());
+    //r = theQ.leftCols(m_r);
+    r = -bb;
+
+    
+    // R
+    //RR = pqr.matrixQR().topRightCorner(m_r, m_r).triangularView<Upper>();
+
+    
+    p = -r;
+    //rsold = r.colwise().squaredNorm();
+    
+    rsold = xtx(r);
+    
+
+    
+    for (int i = 0; i < maxiter; i++) {
+      Ap = AA * p;
+      alpha = (p.transpose() * Ap).colPivHouseholderQr().solve(rsold);
+      x = x + p * alpha;
+      r = r + Ap * alpha;
+      //rsnew = r.colwise().squaredNorm();
+      rsnew = xtx(r);
+
+      if (sqrt(rsnew.diagonal().sum()) < toler) {
+        iters = i;
+        break;
+      }
+      p = -r + p * rsold.colPivHouseholderQr().solve(rsnew);
+      rsold = rsnew;
+    }
+    
+    
+    
+    return List::create(Named("x") = x, // x * RR, 
+                        Named("iters") = iters);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
+
+
+//port incomplete LU factorization
+RcppExport SEXP incompleteLUT_eig(SEXP A, SEXP fillfactor)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::Lower;
+    using Eigen::MappedSparseMatrix;
+    using Eigen::MatrixXd;
+    using Eigen::SparseMatrix;
+    typedef Eigen::MappedSparseMatrix<double> MSpMat;
+    typedef Eigen::SparseMatrix<double> SpMat;
+    const SpMat A_(as<MSpMat>(A));
+
+    
+    const int fillfact(as<int>(fillfactor));
+    
+    Eigen::IncompleteLUT<double> ILUTC;
+    ILUTC.setFillfactor(fillfact);
+    ILUTC.compute(A_);
+    const int numrows(A_.rows());
+    const int numcols(A_.cols());
+    
+    MatrixXd Id(MatrixXd::Identity(numrows, numcols));
+    
+    return wrap(ILUTC.solve(Id));
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+

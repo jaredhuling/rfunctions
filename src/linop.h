@@ -39,4 +39,14 @@ RcppExport SEXP conjugate_gradient_sparse_eigen(SEXP, SEXP, SEXP, SEXP);
 
 RcppExport SEXP conjugate_gradient(SEXP, SEXP, SEXP, SEXP);
 
+RcppExport SEXP ILU_prec_conjugate_gradient_sparse(SEXP, SEXP, SEXP, SEXP);
+
+RcppExport SEXP conjugate_gradient_sparse(SEXP, SEXP, SEXP, SEXP);
+
+RcppExport SEXP block_conjugate_gradient(SEXP, SEXP, SEXP, SEXP);
+
+RcppExport SEXP block_conjugate_gradient_sparse(SEXP, SEXP, SEXP, SEXP);
+
+RcppExport SEXP incompleteLUT_eig(SEXP, SEXP);
+
 #endif

@@ -40,18 +40,19 @@ setGeneric("solveEigen", function(A, b, maxit = 500L, tol = 1e-5, method = c("Bi
 #'system.time(alpha.cg <- solveCG(A, b))
 #'
 #'max(abs(alpha.cg$x - alpha.true))
-setGeneric("solveCG", function(A, b, maxit = 500L, tol = 1e-5) {
+setGeneric("solveCG", function(A, b, maxit = 500L, tol = 1e-5,
+                               preconditioner = c("none", "incompleteLU", "scaling")) {
+  preconditioner <- match.arg(preconditioner)
   stopifnot(inherits(A, "matrix") | inherits(A, "CsparseMatrix"))
-  stopifnot(is.numeric(b))
+  #stopifnot(is.numeric(b))
   n <- nrow(A)
   p <- ncol(A)
   bl <- length(b)
   stopifnot(n == p & p == bl)
   if (inherits(A, "CsparseMatrix")) {
-    stop("not supported yet")
-    #switch(method, 
-    #       BiCGSTAB = .Call("BiCGSTAB_sparse_eigen", A = A, b = b, maxit = maxit, tol = tol, PACKAGE = "rfunctions"),
-    #       CG = .Call("conjugate_gradient_sparse_eigen", A = A, b = b, maxit = maxit, tol = tol, PACKAGE = "rfunctions"))
+    CG = .Call("conjugate_gradient_sparse", A = A, b = b, maxit = maxit, tol = tol, PACKAGE = "rfunctions")
+    CG$x <- drop(CG$x)
+    CG    
   } else {
     stopifnot(is.matrix(A))
     CG = .Call("conjugate_gradient", A = A, b = b, maxit = maxit, tol = tol, PACKAGE = "rfunctions")
@@ -59,6 +60,146 @@ setGeneric("solveCG", function(A, b, maxit = 500L, tol = 1e-5) {
     CG
   }
 })
+
+setMethod("solveCG", signature(A = "matrix", 
+                               b = "vector", 
+                               maxit = "numeric", 
+                               tol = "numeric",
+                               preconditioner = "ANY"),
+          function(A, b, maxit = 500L, tol = 1e-5, preconditioner = c("none", "incompleteLU", "scaling")) {
+            maxit <- as.integer(maxit)
+            preconditioner <- match.arg(preconditioner)
+            CG = .Call("conjugate_gradient", A = A, b = b, maxit = maxit, tol = tol, PACKAGE = "rfunctions")
+            CG$x <- drop(CG$x)
+            CG
+          })
+
+setMethod("solveCG", signature(A = "dgeMatrix", 
+                               b = "vector", 
+                               maxit = "numeric", 
+                               tol = "numeric",
+                               preconditioner = "ANY"),
+          function(A, b, maxit = 500L, tol = 1e-5, preconditioner = c("none", "incompleteLU", "scaling")) {
+            maxit <- as.integer(maxit)
+            preconditioner <- match.arg(preconditioner)
+            CG = .Call("conjugate_gradient", A = as(A, "matrix"), b = b, maxit = maxit, tol = tol, PACKAGE = "rfunctions")
+            CG$x <- drop(CG$x)
+            CG
+          })
+
+
+
+setMethod("solveCG", signature(A = "CsparseMatrix", 
+                               b = "vector", 
+                               maxit = "numeric", 
+                               tol = "numeric",
+                               preconditioner = "ANY"),
+          function(A, b, maxit = 500L, tol = 1e-5, preconditioner = c("none", "incompleteLU", "scaling")) {
+            maxit <- as.integer(maxit)
+            preconditioner <- match.arg(preconditioner)
+            CG = .Call("conjugate_gradient_sparse", A = A, b = b, maxit = maxit, tol = tol, PACKAGE = "rfunctions")
+            CG$x <- drop(CG$x)
+            CG
+          })
+
+
+
+setMethod("solveCG", signature(A = "matrix", 
+                               b = "matrix", 
+                               maxit = "numeric", 
+                               tol = "numeric",
+                               preconditioner = "ANY"),
+          function(A, b, maxit = 500L, tol = 1e-5, preconditioner = c("none", "incompleteLU", "scaling")) {
+            maxit <- as.integer(maxit)
+            preconditioner <- match.arg(preconditioner)
+            CG = .Call("block_conjugate_gradient", A = A, b = b, maxit = maxit, tol = tol, PACKAGE = "rfunctions")
+            CG$x <- drop(CG$x)
+            CG
+          })
+
+setMethod("solveCG", signature(A = "dgeMatrix", 
+                               b = "matrix", 
+                               maxit = "numeric", 
+                               tol = "numeric",
+                               preconditioner = "ANY"),
+          function(A, b, maxit = 500L, tol = 1e-5, preconditioner = c("none", "incompleteLU", "scaling")) {
+            maxit <- as.integer(maxit)
+            preconditioner <- match.arg(preconditioner)
+            CG = .Call("block_conjugate_gradient", A = as(A, "matrix"), b = b, maxit = maxit, tol = tol, PACKAGE = "rfunctions")
+            CG$x <- drop(CG$x)
+            CG
+          })
+
+setMethod("solveCG", signature(A = "matrix", 
+                               b = "dgeMatrix", 
+                               maxit = "numeric", 
+                               tol = "numeric",
+                               preconditioner = "ANY"),
+          function(A, b, maxit = 500L, tol = 1e-5, preconditioner = c("none", "incompleteLU", "scaling")) {
+            maxit <- as.integer(maxit)
+            preconditioner <- match.arg(preconditioner)
+            CG = .Call("block_conjugate_gradient", A = A, b = as(b, "matrix"), maxit = maxit, tol = tol, PACKAGE = "rfunctions")
+            CG$x <- drop(CG$x)
+            CG
+          })
+
+setMethod("solveCG", signature(A = "dgeMatrix", 
+                               b = "dgeMatrix", 
+                               maxit = "numeric", 
+                               tol = "numeric",
+                               preconditioner = "ANY"),
+          function(A, b, maxit = 500L, tol = 1e-5, preconditioner = c("none", "incompleteLU", "scaling")) {
+            maxit <- as.integer(maxit)
+            preconditioner <- match.arg(preconditioner)
+            CG = .Call("block_conjugate_gradient", A = as(A, "matrix"), b = as(b, "matrix"), maxit = maxit, tol = tol, PACKAGE = "rfunctions")
+            CG$x <- drop(CG$x)
+            CG
+          })
+
+setMethod("solveCG", signature(A = "CsparseMatrix", 
+                               b = "matrix", 
+                               maxit = "numeric", 
+                               tol = "numeric",
+                               preconditioner = "ANY"),
+          function(A, b, maxit = 500L, tol = 1e-5, preconditioner = c("none", "incompleteLU", "scaling")) {
+            maxit <- as.integer(maxit)
+            preconditioner <- match.arg(preconditioner)
+            CG = .Call("block_conjugate_gradient_sparse", A = A, b = b, maxit = maxit, tol = tol, PACKAGE = "rfunctions")
+            CG$x <- drop(CG$x)
+            CG
+          })
+
+setMethod("solveCG", signature(A = "CsparseMatrix", 
+                               b = "dgeMatrix", 
+                               maxit = "numeric", 
+                               tol = "numeric",
+                               preconditioner = "ANY"),
+          function(A, b, maxit = 500L, tol = 1e-5, preconditioner = c("none", "incompleteLU", "scaling")) {
+            maxit <- as.integer(maxit)
+            preconditioner <- match.arg(preconditioner)
+            CG = .Call("block_conjugate_gradient_sparse", A = A, b = as(b, "matrix"), maxit = maxit, tol = tol, PACKAGE = "rfunctions")
+            CG$x <- drop(CG$x)
+            CG
+          })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 setMethod("solveEigen", signature(A = "matrix", b = "numeric", maxit = "numeric", 
                                  tol = "numeric", method = "character"),
