@@ -2,7 +2,7 @@
 % Please edit documentation in R/lsmr.R
 \name{lsmr}
 \alias{lsmr}
-\title{Solve the linear system Ax = b using lsmr}
+\title{Solve the linear system A'Ax = Ab using lsmr}
 \usage{
 lsmr(A, b, lambda = 0, atol = 1e-05, btol = 1e-05, conlim = 1e+18,
   maxit = 50L, localSize = 0)
@@ -20,7 +20,7 @@ lsmr(A, b, lambda = 0, atol = 1e-05, btol = 1e-05, conlim = 1e+18,
 list
 }
 \description{
-Solve the linear system Ax = b using lsmr
+Solve the linear system A'Ax = Ab using lsmr
 }
 \examples{
 n <- 10000
@@ -33,8 +33,8 @@ b <- as.vector(x \%*\% rnorm(p) + rnorm(n))
 A <- crossprod(x)
 xtb <- as.vector(crossprod(x, b))
 
-system.time(alpha.true <- solve(A, b))
-system.time(alpha.lsmr <- lsmr(x, b ))
+system.time( alpha.true <- solve(A, b) )
+system.time( alpha.lsmr <- lsmr(x, b) )
 
 max(abs(alpha.lsmr$x - alpha.true))
 }

@@ -1,6 +1,6 @@
 
 
-#' Solve the linear system Ax = b using lsmr
+#' Solve the linear system A'Ax = Ab using lsmr
 #'
 #' @param A square matrix input
 #' @param b numeric vector. 

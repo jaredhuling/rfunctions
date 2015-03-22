@@ -47,7 +47,12 @@ setGeneric("solveCG", function(A, b, maxit = 500L, tol = 1e-5,
   #stopifnot(is.numeric(b))
   n <- nrow(A)
   p <- ncol(A)
-  bl <- length(b)
+  db <- dim(b)
+  if (is.null(db)) {
+    bl <- length(b)
+  } else {
+    bl <- db[1]
+  }
   stopifnot(n == p & p == bl)
   if (inherits(A, "CsparseMatrix")) {
     CG = .Call("conjugate_gradient_sparse", A = A, b = b, maxit = maxit, tol = tol, PACKAGE = "rfunctions")
@@ -55,7 +60,11 @@ setGeneric("solveCG", function(A, b, maxit = 500L, tol = 1e-5,
     CG    
   } else {
     stopifnot(is.matrix(A))
-    CG = .Call("conjugate_gradient", A = A, b = b, maxit = maxit, tol = tol, PACKAGE = "rfunctions")
+    if (is.matrix(b)) {
+      CG = .Call("block_conjugate_gradient", A = A, b = b, maxit = maxit, tol = tol, PACKAGE = "rfunctions")
+    } else {
+      CG = .Call("conjugate_gradient", A = A, b = b, maxit = maxit, tol = tol, PACKAGE = "rfunctions")
+    }
     CG$x <- drop(CG$x)
     CG
   }
