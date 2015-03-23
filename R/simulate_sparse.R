@@ -13,7 +13,7 @@
 #'
 #'#simulate a very sparse matrix (this matrix has many zeros and few ones)
 #'x.sparse <- simSparseMatrix(sparsity = 0.99, dim = c(n.obs, n.vars), boolean = T)
-simSparseMatrix <- function(sparsity, dim, boolean = T, slam = F) {
+simSparseMatrix <- function(sparsity, dim, boolean = FALSE, slam = FALSE) {
   #  generate a sparse X matrix with given sparsity
   #  and dimensions. can be boolean-valued or continuous
   stopifnot(length(dim) == 2)

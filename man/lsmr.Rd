@@ -5,16 +5,22 @@
 \title{Solve the linear system A'Ax = Ab using lsmr}
 \usage{
 lsmr(A, b, lambda = 0, atol = 1e-05, btol = 1e-05, conlim = 1e+18,
-  maxit = 50L, localSize = 0)
+  maxit = 50L, localSize = 0L)
 }
 \arguments{
-\item{A}{square matrix input}
+\item{A}{CsparseMatrix intput (matrix soon to be included)}
 
 \item{b}{numeric vector.}
 
+\item{atol}{tolerance level}
+
+\item{btol}{tolerance level}
+
+\item{conlim}{condition number limit}
+
 \item{maxit}{integer. Maximum number of iterations}
 
-\item{tol}{tolerance level}
+\item{localsize}{integer number of local iterations for reorthogonalization}
 }
 \value{
 list

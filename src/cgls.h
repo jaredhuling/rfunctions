@@ -15,10 +15,13 @@ using namespace RcppEigen;
 
 inline Eigen::ArrayXd Dplus(const Eigen::ArrayXd& d);
 
-RcppExport SEXP cgls_sparse(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 RcppExport SEXP cgls(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 RcppExport SEXP block_cgls(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+
+RcppExport SEXP cgls_sparse(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+
+RcppExport SEXP block_cgls_sparse(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 #endif

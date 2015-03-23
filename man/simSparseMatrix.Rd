@@ -4,7 +4,7 @@
 \alias{simSparseMatrix}
 \title{Simulate a matrix with very few nonzero entries}
 \usage{
-simSparseMatrix(sparsity, dim, boolean = T, slam = F)
+simSparseMatrix(sparsity, dim, boolean = FALSE, slam = FALSE)
 }
 \arguments{
 \item{sparsity}{numeric value between 0 and 1 indicating level of sparseness}
