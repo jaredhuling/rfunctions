@@ -33,6 +33,14 @@ setMethod("crossprodcpp", signature(x = "matrix", w = "missing"),
           function(x) .Call("crossprodcpp", X = x, PACKAGE = "rfunctions"),
           valueClass = "matrix")
 
+setMethod("crossprodcpp", signature(x = "dgCMatrix", w = "missing"),
+          function(x) forceSymmetric(.Call("crossprodSparsecpp", X = x, PACKAGE = "rfunctions"), uplo="U"),
+          valueClass = "dscMatrix")
+
+setMethod("crossprodcpp", signature(x = "dsCMatrix", w = "missing"),
+          function(x) forceSymmetric(.Call("crossprodSparsecpp", X = x, PACKAGE = "rfunctions"), uplo="U"),
+          valueClass = "dscMatrix")
+
 setMethod("crossprodcpp", signature(x = "dgeMatrix", w = "numeric"),
           function(x, w = NULL) .Call("xpwx", X = x, W = w, PACKAGE = "rfunctions"),
           valueClass = "dgeMatrix")
@@ -94,5 +102,37 @@ fastRank <- function(M) {
   stopifnot(inherits(M, "matrix"))
   stopifnot(is.numeric(M))
   .Call("fastRank", AA = M, PACKAGE = "rfunctions")
+}
+
+
+#' Compute X[,indices]'y 
+#'
+#' @param x matrix input
+#' @param y numeric vector. 
+#' @param indices integer vector of X columns to use
+#' @return x[,indices]'y
+#' @export
+#' @examples
+#'n.obs <- 1e4
+#'n.vars <- 2000
+#'n.idx <- 500
+#'
+#'x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
+#'y <- rnorm(n.obs)
+#'idx <- sample.int(n.vars, n.idx)
+#'
+#'## compute x[,idx]'y
+#'xpy <- sliced.crossprod(x, y, idx)
+#'
+#'xpy2 <- crossprod(x[,idx], y)
+#'
+#'all.equal(xpy, xpy2)
+#'
+#'@export
+sliced.crossprod <- function(x, y, indices) {
+  stopifnot(inherits(x, "matrix"))
+  stopifnot(is.numeric(x))
+  stopifnot(is.numeric(y))
+  .Call("sliced_crossprod", X_ = x, Y_ = y, idx_ = as.integer(indices), PACKAGE = "rfunctions")
 }
 

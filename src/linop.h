@@ -17,6 +17,10 @@ inline Eigen::ArrayXd Dplus(const Eigen::ArrayXd& d);
 
 RcppExport SEXP crossprodcpp(SEXP);
 
+RcppExport SEXP crossprodSparsecpp(SEXP);
+
+RcppExport SEXP crossprodSparsecpphaha(SEXP, SEXP);
+
 RcppExport SEXP xpwx(SEXP, SEXP);
                                
 RcppExport SEXP subcpp(SEXP, SEXP);
@@ -48,5 +52,7 @@ RcppExport SEXP block_conjugate_gradient(SEXP, SEXP, SEXP, SEXP);
 RcppExport SEXP block_conjugate_gradient_sparse(SEXP, SEXP, SEXP, SEXP);
 
 RcppExport SEXP incompleteLUT_eig(SEXP, SEXP);
+
+RcppExport SEXP sliced_crossprod(SEXP, SEXP, SEXP);
 
 #endif

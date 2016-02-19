@@ -29,6 +29,65 @@ RcppExport SEXP crossprodcpp(SEXP X)
 }
 
 //port faster cross product 
+RcppExport SEXP crossprodSparsecpp(SEXP X)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::MappedSparseMatrix;
+    using Eigen::SparseMatrix;
+    using Eigen::Upper;
+    using Eigen::Lower;
+    typedef MappedSparseMatrix<double> MSpMat;
+    typedef SparseMatrix<double> SpMat;
+    const SpMat A(as<MSpMat>(X));
+    
+    const int n(A.cols());
+    SpMat AtA(SpMat(n, n).selfadjointView<Upper>().rankUpdate(A.adjoint()));
+    return wrap(AtA);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
+//port faster cross product 
+RcppExport SEXP crossprodSparsecpphaha(SEXP X, SEXP Y)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::MappedSparseMatrix;
+    using Eigen::SparseMatrix;
+    using Eigen::Upper;
+    using Eigen::Lower;
+    typedef MappedSparseMatrix<double> MSpMat;
+    typedef SparseMatrix<double> SpMat;
+    const SpMat A(as<MSpMat>(X));
+    const SpMat B(as<MSpMat>(Y));
+    
+    const int n(A.cols());
+    const int m(B.cols());
+    SpMat AtA(n, n);
+    SpMat res(n, m);
+    AtA.selfadjointView<Lower>().rankUpdate(A.adjoint());
+    res = AtA * B;
+    return wrap(res);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
+//port faster cross product 
 RcppExport SEXP xpwx(SEXP X, SEXP W)
 {
   using namespace Rcpp;
@@ -776,4 +835,59 @@ RcppExport SEXP incompleteLUT_eig(SEXP A, SEXP fillfactor)
   }
   return R_NilValue; //-Wall
 }
+
+
+
+
+
+
+
+RcppExport SEXP sliced_crossprod(SEXP X_, SEXP Y_, SEXP idx_)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::VectorXd;
+    using Eigen::VectorXi;
+    using Rcpp::List;
+    using Eigen::MappedSparseMatrix;
+    using Eigen::SparseMatrix;
+    using Eigen::Upper;
+    typedef MappedSparseMatrix<double> MSpMat;
+    typedef SparseMatrix<double> SpMat;
+    typedef Map<VectorXi> MapVeci;
+    typedef Map<VectorXd> MapVecd;
+    typedef Map<MatrixXd> MapMatd;
+    
+    const MapMatd X(as<MapMatd>(X_));
+    const MapVecd Y(as<MapVecd>(Y_));
+    const MapVeci idx(as<MapVeci>(idx_));
+    //const MapMatd init_(as<MapMatd>(init));
+    
+    const int nn(X.rows());
+    const int pp(X.cols());
+    const int rr(idx.size());
+    VectorXd retvec(rr);
+    
+    for (int cl = 0; cl < rr; ++cl)
+    {
+      retvec(cl) = X.col(idx(cl)-1).dot(Y);
+    }
+    
+    return wrap(retvec);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
+
+
+
+
+
 

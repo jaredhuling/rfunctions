@@ -5,7 +5,13 @@ Version: 0.1
 Date: 2014-03-15
 Author: Jared Huling <jaredhuling@gmail.com>
 Maintainer: Jared Huling <jaredhuling@gmail.com>
-Description: R functions that are useful or are fast. Most of the implementation is in C++, utilizing RcppEigen
+Description: R functions that are useful or are fast. Most of the implementation
+    is in C++, utilizing RcppEigen
 License: GPL-3
-Depends: Rcpp (>= 0.10.2), RcppEigen (>= 0.3.2.1.1), Matrix, methods
+Depends:
+    Rcpp (>= 0.10.2),
+    RcppEigen (>= 0.3.2.1.1),
+    Matrix,
+    methods
 LinkingTo: Rcpp, RcppEigen, BH
+RoxygenNote: 5.0.1
