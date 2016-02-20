@@ -52,7 +52,7 @@ RcppExport SEXP crossprodeig(SEXP X)
 
 
 
-RcppExport SEXP matvecprodidx(SEXP X_, SEXP Y_, SEXP idx_)
+RcppExport SEXP matveccrossprodidx(SEXP X_, SEXP Y_, SEXP idx_)
 {
   using namespace Rcpp;
   using namespace RcppEigen;
@@ -92,6 +92,64 @@ RcppExport SEXP matvecprodidx(SEXP X_, SEXP Y_, SEXP idx_)
     //std::cout << "crossprod: " << AtA << std::endl;
     
     //Matrix AtAf = Map<Matrix>( xtx_ptr, AtA.rows(), AtA.cols() );
+    
+    
+    return wrap(retvec);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
+
+RcppExport SEXP matvecprodidx(SEXP A_, SEXP b_, SEXP idx_)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::VectorXd;
+    using Eigen::VectorXi;
+    using Rcpp::List;
+    using Eigen::MappedSparseMatrix;
+    using Eigen::SparseMatrix;
+    using Eigen::Upper;
+    typedef MappedSparseMatrix<double> MSpMat;
+    typedef SparseMatrix<double> SpMat;
+    typedef Map<VectorXi> MapVeci;
+    typedef Map<VectorXd> MapVecd;
+    typedef Map<MatrixXd> MapMatd;
+    
+    const MapMatd A(as<MapMatd>(A_));
+    const MapVecd b(as<MapVecd>(b_));
+    const MapVeci idx(as<MapVeci>(idx_));
+    //const MapMatd init_(as<MapMatd>(init));
+    
+    const int nn(A.rows());
+    const int pp(A.cols());
+    const int rr(idx.size());
+    VectorXd retvec(nn);
+    retvec.setZero();
+    
+    
+    for (int cl = 0; cl < rr; ++cl)
+    {
+      for (int r = 0; r < nn; ++r)
+      {
+        retvec(r) += A(r, idx(cl) - 1) * b( idx(cl) - 1 );
+      }
+    }
+    
+    /*
+    for (size_t cl = 0; cl < rr; ++cl)
+      for (size_t r = 0; r < nn; ++r)
+      {
+        retvec(r) += A(r,idx(cl)-1) * b(idx(cl)-1);
+      }
+     */
     
     
     return wrap(retvec);
