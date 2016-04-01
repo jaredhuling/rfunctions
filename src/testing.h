@@ -21,4 +21,6 @@ RcppExport SEXP matveccrossprodidx(SEXP, SEXP, SEXP);
 
 RcppExport SEXP matvecprodidx(SEXP, SEXP, SEXP);
 
+RcppExport SEXP appendMat(SEXP, SEXP);
+
 #endif

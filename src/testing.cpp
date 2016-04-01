@@ -160,3 +160,82 @@ RcppExport SEXP matvecprodidx(SEXP A_, SEXP b_, SEXP idx_)
   }
   return R_NilValue; //-Wall
 }
+
+
+
+
+
+RcppExport SEXP appendMat(SEXP X_, SEXP Y_)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::VectorXd;
+    using Eigen::VectorXi;
+    using Rcpp::List;
+    using Eigen::MappedSparseMatrix;
+    using Eigen::SparseMatrix;
+    using Eigen::Upper;
+    typedef MappedSparseMatrix<double> MSpMat;
+    typedef SparseMatrix<double> SpMat;
+    typedef Map<VectorXi> MapVeci;
+    typedef Map<VectorXd> MapVecd;
+    typedef Map<MatrixXd> MapMatd;
+    
+    const MapMatd X(as<MapMatd>(X_));
+    const MapVecd Y(as<MapVecd>(Y_));
+    
+    const int nn(X.rows());
+    const int pp(X.cols());
+    
+    MatrixXd datX(nn, pp+1);
+    
+    datX << Y, X ;
+    
+    return wrap(datX);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
+
+
+RcppExport SEXP strcompare(SEXP str_)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::VectorXd;
+    using Eigen::VectorXi;
+    using Rcpp::List;
+    using Eigen::MappedSparseMatrix;
+    using Eigen::SparseMatrix;
+    using Eigen::Upper;
+    typedef MappedSparseMatrix<double> MSpMat;
+    typedef SparseMatrix<double> SpMat;
+    typedef Map<VectorXi> MapVeci;
+    typedef Map<VectorXd> MapVecd;
+    typedef Map<MatrixXd> MapMatd;
+    
+    const std::vector<std::string> strr(as< std::vector<std::string> >(str_));
+    
+    bool res = strr[0] == "truth";
+    int res2 = strr.size();
+    
+    return wrap(res2);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
+
