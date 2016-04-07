@@ -1,3 +1,5 @@
+
+#include <igl/slice.h>
 #include <iostream>
 #include "testing.h"
 #include "utils.h"
@@ -42,6 +44,101 @@ RcppExport SEXP crossprodeig(SEXP X)
     Vector evals = eigs.eigenvalues();
     
     return wrap(evals);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
+
+//port faster cross product 
+RcppExport SEXP crossprodsubset(SEXP X, SEXP idxvec_)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::MatrixXi;
+    using Eigen::VectorXi;
+    using Eigen::Lower;
+    typedef float Scalar;
+    typedef double Double;
+    typedef Eigen::Matrix<Double, Eigen::Dynamic, Eigen::Dynamic> Matrix;
+    typedef Eigen::Matrix<Double, Eigen::Dynamic, 1> Vector;
+    typedef Eigen::Map<const Matrix> MapMat;
+    typedef Eigen::Map<const Vector> MapVec;
+    typedef Map<VectorXd> MapVecd;
+    typedef Map<VectorXi> MapVeci;
+    typedef Eigen::SparseVector<double> SparseVector;
+    typedef Eigen::SparseVector<int> SparseVectori;
+    
+    //const Map<MatrixXd> A(as<Map<MatrixXd> >(X));
+    
+    const MatrixXd A(as<MatrixXd>(X));
+    const VectorXi idxvec(as<VectorXi>(idxvec_));
+    //MapMat A(as<MapMat>(X));
+    
+    int nvars = A.cols() - 1;
+    MatrixXd sub;
+    
+    VectorXi all;
+    igl::colon<int>(0, int(nvars), all);
+    
+    igl::slice(A, idxvec, all, sub);
+    
+    const int n(A.cols());
+    MatrixXd AtA(MatrixXd(n, n).setZero().
+                   selfadjointView<Lower>().rankUpdate(sub.adjoint() ));
+    
+    
+    return wrap(AtA);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
+
+//port faster cross product 
+RcppExport SEXP crossprodxval(SEXP X, SEXP idxvec_)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::VectorXi;
+    using Eigen::Lower;
+    typedef float Scalar;
+    typedef double Double;
+    typedef Eigen::Matrix<Double, Eigen::Dynamic, Eigen::Dynamic> Matrix;
+    typedef Eigen::Matrix<Double, Eigen::Dynamic, 1> Vector;
+    typedef Eigen::Map<const Matrix> MapMat;
+    typedef Eigen::Map<const Vector> MapVec;
+    typedef Map<VectorXd> MapVecd;
+    typedef Map<VectorXi> MapVeci;
+    typedef Eigen::SparseVector<double> SparseVector;
+    typedef Eigen::SparseVector<int> SparseVectori;
+    
+    const Map<MatrixXd> A(as<Map<MatrixXd> >(X));
+    const MapVeci idxvec(as<MapVeci>(idxvec_));
+    //MapMat A(as<MapMat>(X));
+    
+    Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic> permutation(idxvec);
+    int nselect = idxvec.size();
+    MatrixXd sub = (A*permutation).topRows(nselect);
+    
+    const int n(A.cols());
+    MatrixXd AtA(MatrixXd(n, n).setZero().
+                   selfadjointView<Lower>().rankUpdate(sub.adjoint() ));
+    
+    
+    return wrap(AtA);
   } catch (std::exception &ex) {
     forward_exception_to_r(ex);
   } catch (...) {

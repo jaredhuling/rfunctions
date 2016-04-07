@@ -3,6 +3,7 @@
 
 #include <Rcpp.h>
 #include <RcppEigen.h>
+#include <igl/slice.h>
 #include <Eigen/SVD>
 #include <vector> 
 #include <functional> 
@@ -16,6 +17,10 @@ using namespace Rcpp;
 using namespace RcppEigen;
 
 RcppExport SEXP crossprodeig(SEXP);
+
+RcppExport SEXP crossprodxval(SEXP, SEXP);
+
+RcppExport SEXP crossprodsubset(SEXP, SEXP);
 
 RcppExport SEXP matveccrossprodidx(SEXP, SEXP, SEXP);
 
