@@ -114,31 +114,62 @@ RcppExport SEXP crossprodxval(SEXP X, SEXP idxvec_)
     using Eigen::MatrixXd;
     using Eigen::VectorXi;
     using Eigen::Lower;
+    using Rcpp::List;
     typedef float Scalar;
     typedef double Double;
-    typedef Eigen::Matrix<Double, Eigen::Dynamic, Eigen::Dynamic> Matrix;
-    typedef Eigen::Matrix<Double, Eigen::Dynamic, 1> Vector;
-    typedef Eigen::Map<const Matrix> MapMat;
+    typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> Matrix;
+    typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixRXd;
+    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Vector;
+    typedef Eigen::Map<Matrix> MapMat;
+    typedef Eigen::Map<MatrixRXd> MapRMat;
     typedef Eigen::Map<const Vector> MapVec;
     typedef Map<VectorXd> MapVecd;
     typedef Map<VectorXi> MapVeci;
     typedef Eigen::SparseVector<double> SparseVector;
     typedef Eigen::SparseVector<int> SparseVectori;
     
-    const Map<MatrixXd> A(as<Map<MatrixXd> >(X));
+    
+    const MapMat AA(as<MapMat>(X));
     const MapVeci idxvec(as<MapVeci>(idxvec_));
-    //MapMat A(as<MapMat>(X));
     
-    Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic> permutation(idxvec);
-    int nselect = idxvec.size();
-    MatrixXd sub = (A*permutation).topRows(nselect);
+    const int n(AA.cols());
+    MatrixXd AtA(MatrixXd(n, n));
+    MatrixRXd A = AA;
+    int nfolds = idxvec.maxCoeff();
     
-    const int n(A.cols());
-    MatrixXd AtA(MatrixXd(n, n).setZero().
-                   selfadjointView<Lower>().rankUpdate(sub.adjoint() ));
+    List xtxlist(nfolds);
     
+    for (int k = 1; k < nfolds + 1; ++k)
+    {
     
-    return wrap(AtA);
+      VectorXi idxbool = (idxvec.array() == k).cast<int>();
+      int nrow = idxbool.size();
+      int numelem = idxbool.sum();
+      VectorXi idx(numelem);
+      int c = 0;
+      for (int i = 0; i < nrow; ++i)
+      {
+        if (idxbool(i) == 1)
+        {
+          idx(c) = i;
+          ++c;
+        }
+      }
+      
+      int nvars = A.cols() - 1;
+      MatrixXd sub(numelem, n);
+      
+      for (int r = 0; r < numelem; ++r)
+      {
+        sub.row(r) = A.row(idx(r));
+      }
+      
+      MatrixXd AtAtmp(MatrixXd(n, n).setZero().
+                      selfadjointView<Lower>().rankUpdate(sub.adjoint() ));
+      xtxlist[k-1] = AtAtmp;
+    }
+    
+    return wrap(xtxlist);
   } catch (std::exception &ex) {
     forward_exception_to_r(ex);
   } catch (...) {
