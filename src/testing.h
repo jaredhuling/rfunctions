@@ -20,6 +20,8 @@ RcppExport SEXP crossprodeig(SEXP);
 
 RcppExport SEXP crossprodxval(SEXP, SEXP);
 
+RcppExport SEXP dev_resid_logistic(SEXP, SEXP);
+
 RcppExport SEXP crossprodsubset(SEXP, SEXP);
 
 RcppExport SEXP matveccrossprodidx(SEXP, SEXP, SEXP);

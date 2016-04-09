@@ -179,6 +179,57 @@ RcppExport SEXP crossprodxval(SEXP X, SEXP idxvec_)
 }
 
 
+// deviance residuals for a binomial glm
+RcppExport SEXP dev_resid_logistic(SEXP y_, SEXP prob_)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::VectorXi;
+    using Eigen::Lower;
+    using Rcpp::List;
+    typedef float Scalar;
+    typedef double Double;
+    typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> Matrix;
+    typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixRXd;
+    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Vector;
+    typedef Eigen::Map<Matrix> MapMat;
+    typedef Eigen::Map<MatrixRXd> MapRMat;
+    typedef Eigen::Map<const Vector> MapVec;
+    typedef Map<VectorXd> MapVecd;
+    typedef Map<VectorXi> MapVeci;
+    typedef Eigen::SparseVector<double> SparseVector;
+    typedef Eigen::SparseVector<int> SparseVectori;
+    
+    
+    const MapVecd y(as<MapVecd>(y_));
+    const MapVecd prob(as<MapVecd>(prob_));
+    
+    
+    int n = y.size();
+    VectorXd dev(n);
+    for (int i = 0; i < n; ++i)
+    {
+      if (y(i) == 1)
+      {
+        dev(i) = std::sqrt(2 * std::log(1/prob(i)));
+      } else 
+      {
+        dev(i) = -std::sqrt(2 * std::log(1/(1 - prob(i))));
+      }
+    }
+    
+    return wrap(dev);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
 
 RcppExport SEXP matveccrossprodidx(SEXP X_, SEXP Y_, SEXP idx_)
 {
