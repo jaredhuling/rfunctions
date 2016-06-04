@@ -54,6 +54,219 @@ RcppExport SEXP crossprodeig(SEXP X)
 
 
 //port faster cross product 
+RcppExport SEXP listtest(SEXP len, SEXP sizea, SEXP sizeb)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::Lower;
+    typedef float Scalar;
+    typedef double Double;
+    typedef Eigen::Matrix<Double, Eigen::Dynamic, Eigen::Dynamic> Matrix;
+    typedef Eigen::Matrix<Double, Eigen::Dynamic, 1> Vector;
+    typedef Eigen::Map<const Matrix> MapMat;
+    typedef Eigen::Map<const Vector> MapVec;
+    const int length(as<int>(len));
+    const int sizeA(as<int>(sizea));
+    const int sizeB(as<int>(sizeb));
+    //MapMat A(as<MapMat>(X));
+    
+    std::vector<Eigen::MatrixXd> retlist(length);
+    
+    for (int i = 0; i < length; ++i)
+    {
+      retlist[i] = MatrixXd(sizeA, sizeB);
+    }
+    
+    return wrap(retlist);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
+RcppExport SEXP tcrossprodvec (SEXP X)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::Lower;
+    typedef float Scalar;
+    typedef double Double;
+    typedef Eigen::Matrix<Double, Eigen::Dynamic, Eigen::Dynamic> Matrix;
+    typedef Eigen::Matrix<Double, Eigen::Dynamic, 1> Vector;
+    typedef Eigen::Map<const Matrix> MapMat;
+    typedef Eigen::Map<const Vector> MapVec;
+    const Eigen::Map<VectorXd> A(as<Map<VectorXd> >(X));
+    //MapMat A(as<MapMat>(X));
+    
+    const int n(A.rows());
+    
+    MatrixXd AtA(MatrixXd(n, n).setZero());
+    
+    AtA.bottomRightCorner(n, n) = MatrixXd(n, n).setZero().selfadjointView<Lower>().rankUpdate(A);
+    
+    return wrap(AtA);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
+RcppExport SEXP crossprodint(SEXP X)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::Lower;
+    typedef float Scalar;
+    typedef double Double;
+    typedef Eigen::Matrix<Double, Eigen::Dynamic, Eigen::Dynamic> Matrix;
+    typedef Eigen::Matrix<Double, Eigen::Dynamic, 1> Vector;
+    typedef Eigen::Map<const Matrix> MapMat;
+    typedef Eigen::Map<const Vector> MapVec;
+    const Eigen::Map<MatrixXd> A(as<Map<MatrixXd> >(X));
+    //MapMat A(as<MapMat>(X));
+    
+    const int n(A.cols());
+    
+    MatrixXd AtA(MatrixXd(n+1, n+1).setZero());
+    
+    AtA.bottomRightCorner(n, n) = MatrixXd(n, n).setZero().selfadjointView<Lower>().rankUpdate(A.adjoint());
+    
+    return wrap(AtA);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
+RcppExport SEXP matcopytest(SEXP X)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::Lower;
+    typedef float Scalar;
+    typedef double Double;
+    typedef Eigen::Matrix<Double, Eigen::Dynamic, Eigen::Dynamic> Matrix;
+    typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixRXd;
+    typedef Eigen::Matrix<Double, Eigen::Dynamic, 1> Vector;
+    typedef Eigen::Map<const Matrix> MapMat;
+    typedef Eigen::Map<const Vector> MapVec;
+    //const Eigen::Map<MatrixXd> A(as<Map<MatrixXd> >(X));
+    
+    Rcpp::NumericMatrix xx(X);
+    
+    
+    const int n = xx.rows();
+    const int p = xx.cols();
+    
+    MatrixRXd XX(n, p);
+    
+    // Copy data 
+    std::copy(xx.begin(), xx.end(), XX.data());
+    
+    
+    MatrixXd AtA(MatrixXd(p, p).setZero().selfadjointView<Lower>().rankUpdate(XX.adjoint()));
+    
+    return wrap(AtA);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
+
+
+RcppExport SEXP crossprodrowmajor(SEXP X, SEXP yes)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::Lower;
+    typedef float Scalar;
+    typedef double Double;
+    typedef Eigen::Matrix<Double, Eigen::Dynamic, Eigen::Dynamic> Matrix;
+    typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixRXd;
+    typedef Eigen::Matrix<Double, Eigen::Dynamic, 1> Vector;
+    typedef Eigen::Map<const Matrix> MapMat;
+    typedef Eigen::Map<const Vector> MapVec;
+    const bool rmyes(as<bool>(yes));
+    const Eigen::Map<MatrixXd> A(as<Map<MatrixXd> >(X));
+    //MapMat A(as<MapMat>(X));
+    
+    MatrixRXd AA = A;
+    
+    const int n(A.cols());
+    
+    MatrixXd AtA;
+    if (rmyes)
+    {
+      AtA = MatrixXd(n, n).setZero().selfadjointView<Lower>().rankUpdate(AA.adjoint());
+    } else 
+    {
+      AtA = MatrixXd(n, n).setZero().selfadjointView<Lower>().rankUpdate(A.adjoint());
+    }
+    
+    return wrap(AtA);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
+//port faster cross product 
+RcppExport SEXP lentest(SEXP X)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::Lower;
+    typedef float Scalar;
+    typedef double Double;
+    typedef Eigen::Matrix<Double, Eigen::Dynamic, Eigen::Dynamic> Matrix;
+    typedef Eigen::Matrix<Double, Eigen::Dynamic, 1> Vector;
+    typedef Eigen::Map<const Matrix> MapMat;
+    typedef Eigen::Map<const Vector> MapVec;
+    const VectorXd vec(as<VectorXd>(X));
+    //MapMat A(as<MapMat>(X));
+    
+    const int n(vec.size());
+    
+    return wrap(n);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
+
+
+//port faster cross product 
 RcppExport SEXP crossprodsubset(SEXP X, SEXP idxvec_)
 {
   using namespace Rcpp;

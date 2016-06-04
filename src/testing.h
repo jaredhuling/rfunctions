@@ -18,6 +18,18 @@ using namespace RcppEigen;
 
 RcppExport SEXP crossprodeig(SEXP);
 
+RcppExport SEXP matcopytest(SEXP);
+
+RcppExport SEXP listtest(SEXP, SEXP, SEXP);
+
+RcppExport SEXP tcrossprodvec (SEXP);
+
+RcppExport SEXP crossprodint(SEXP);
+
+RcppExport SEXP crossprodrowmajor(SEXP, SEXP);
+
+RcppExport SEXP lentest(SEXP);
+
 RcppExport SEXP crossprodxval(SEXP, SEXP);
 
 RcppExport SEXP dev_resid_logistic(SEXP, SEXP);

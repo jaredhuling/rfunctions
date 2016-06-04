@@ -13,5 +13,5 @@ Depends:
     RcppEigen (>= 0.3.2.1.1),
     Matrix,
     methods
-LinkingTo: Rcpp, RcppEigen, BH
+LinkingTo: Rcpp, RcppEigen, BH, bigmemory
 RoxygenNote: 5.0.1
