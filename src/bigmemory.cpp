@@ -100,9 +100,7 @@ RcppExport SEXP crossprod_big(SEXP X_)
 
 RcppExport SEXP colsums_big(SEXP X_)
 {
-  using namespace Rcpp;
-  using namespace RcppEigen;
-  try {
+  BEGIN_RCPP
     using Eigen::Map;
     using Eigen::MatrixXd;
     using Eigen::VectorXd;
@@ -143,12 +141,7 @@ RcppExport SEXP colsums_big(SEXP X_)
       throw Rcpp::exception("Undefined type for provided big.matrix");
     }
 
-  } catch (std::exception &ex) {
-    forward_exception_to_r(ex);
-  } catch (...) {
-    ::Rf_error("C++ exception (unknown reason)");
-  }
-  return R_NilValue; //-Wall
+    END_RCPP
 }
 
 
