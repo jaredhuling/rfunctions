@@ -10,13 +10,13 @@
 #include <algorithm> 
 #include <iostream>
 #include <cmath>
-#include "Spectra/SymEigsSolver.h"
+//#include "Spectra/SymEigsSolver.h"
 #include "MatOp.h"
 
 using namespace Rcpp;
 using namespace RcppEigen;
 
-RcppExport SEXP crossprodeig(SEXP);
+//RcppExport SEXP crossprodeig(SEXP);
 
 RcppExport SEXP matcopytest(SEXP);
 
@@ -41,5 +41,7 @@ RcppExport SEXP matveccrossprodidx(SEXP, SEXP, SEXP);
 RcppExport SEXP matvecprodidx(SEXP, SEXP, SEXP);
 
 RcppExport SEXP appendMat(SEXP, SEXP);
+
+RcppExport SEXP sparseLoopSubset(SEXP, SEXP);
 
 #endif

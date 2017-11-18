@@ -9,6 +9,7 @@ using namespace Rcpp;
 using namespace RcppEigen;
 
 //port faster cross product 
+/*
 RcppExport SEXP crossprodeig(SEXP X)
 {
   using namespace Rcpp;
@@ -51,6 +52,7 @@ RcppExport SEXP crossprodeig(SEXP X)
   }
   return R_NilValue; //-Wall
 }
+*/
 
 
 //port faster cross product 
@@ -631,3 +633,43 @@ RcppExport SEXP strcompare(SEXP str_)
 }
 
 
+
+
+RcppExport SEXP sparseLoopSubset(SEXP X, SEXP colnum)
+{
+  using namespace Rcpp;
+  using namespace RcppEigen;
+  try {
+    using Eigen::Map;
+    using Eigen::MatrixXd;
+    using Eigen::MappedSparseMatrix;
+    using Eigen::SparseMatrix;
+    using Eigen::Upper;
+    using Eigen::Lower;
+    
+    typedef MappedSparseMatrix<double> MSpMat;
+    typedef SparseMatrix<double> SpMat;
+    typedef MSpMat::InnerIterator InIterMat;
+    
+    const MSpMat A(as<MSpMat>(X));
+    const int c(as<int>(colnum));
+    
+    const int p(A.cols());
+    double retval = 0;
+    
+    for (int j = 0; j < p; ++j)
+    {
+      for (InIterMat i_(A, j); i_.row() < c; ++i_)
+      {
+        retval += i_.value();
+      }
+    }
+    
+    return wrap(retval);
+  } catch (std::exception &ex) {
+    forward_exception_to_r(ex);
+  } catch (...) {
+    ::Rf_error("C++ exception (unknown reason)");
+  }
+  return R_NilValue; //-Wall
+}
